@@ -1,0 +1,326 @@
+#! /usr/bin/env python
+# import ros stuff
+
+import rospy
+import numpy as np
+
+from sensor_msgs.msg import LaserScan, Range
+from geometry_msgs.msg import Twist
+
+
+from nav_msgs.msg import Odometry
+from tf import transformations
+from std_srvs.srv import *
+
+import math
+pub = None
+
+state = 0
+state_dict_ = {
+    0: 'find the wall',
+    1: 'turn left',
+    2: 'turn right',
+    3: 'adjust to left',
+    4: 'adjust to left soft',
+    5: 'adjust to right',
+    6: 'adjust to right soft',
+    7: 'all good',
+}
+
+#LIDAR eh origem do sistema
+front_vector_lidar = np.array([0.0, 0.0])
+back_vector_lidar = np.array([0.0, 0.0])
+
+
+#vetor da origem a parede na frente
+front_vector_prox = np.array([0.0, 0.0]) 
+
+#vetor da origem a parede atras
+bottom_vector_prox = np.array([0.0, 0.0])
+
+#posicao dos sensores no sistema
+bottom_position = np.array([-0.22, -0.25])
+front_position = np.array([0.22, -0.25])
+#todos os sensores sao da esquerda
+
+wall_direction = np.array([0.0, 0.0])
+
+#distance robot will keep from wall
+best_distance = 0.5
+closest_point = 0.0
+
+
+regions = [0.0] * 720
+
+next_turn_direction = 0
+
+
+def clbk_lidar(msg):
+    global regions, front_vector_lidar, back_vector_lidar, closest_point
+    for i in range(0, 719, 1):
+        regions[i] = min(msg.ranges[i], 10)
+    #print (regions)
+    distance_to_wall = min(min(regions[361 : 719]), 20.0)
+    closest_point = distance_to_wall*np.array([np.cos(math.radians((regions.index(distance_to_wall, 361)-180)/2)), 
+                    np.sin(math.radians((regions.index(distance_to_wall, 361)-180)/2))])
+    #print closest_point
+    front_vector_lidar = np.array([min(regions[539 : 541]), 0.0])
+    ang_back = 30.0
+    back_vector_lidar = np.array([regions[int(2*ang_back+540)]*np.cos((ang_back*np.pi)/180), regions[int(2*ang_back+540)]*np.sin((ang_back*np.pi)/180)])
+    #print back_vector_lidar
+    
+    
+    
+
+def clbk_prox_bottom(msg):
+    global bottom_vector_prox, bottom_position
+    bottom_vector_prox = np.array([-msg.range, 0.0]) + bottom_position
+    #rospy.loginfo(bottom_vector_prox)
+
+
+def clbk_prox_front(msg):
+    global front_vector_prox, front_position
+    front_vector_prox = np.array([-msg.range, 0.0]) + front_position
+    #rospy.loginfo(front_vector_prox)
+
+
+def find_wall_direction():
+    global bottom_vector_prox, front_vector_prox, wall_direction, front_vector_lidar, back_vector_lidar, regions, closest_point
+
+
+    #wall_direction = front_vector_prox - bottom_vector_prox
+    distancia_normal = sum(regions[538 : 542])/5
+    wall_direction = closest_point - np.array([distancia_normal, 0.0])
+    magnitude = np.linalg.norm(wall_direction)
+    if magnitude != 0:
+        wall_direction = wall_direction / magnitude
+        print "Wall direction and angle"
+        print wall_direction
+        print math.degrees(math.asin(wall_direction[1]))
+    else:
+        print "magnitude == 0"
+    #rospy.loginfo(wall_direction)
+
+def find_next_corner():
+    global wall_direction, regions, front_vector_prox, bottom_vector_prox, next_turn_direction, best_distance, front_vector_lidar, back_vector_lidar
+
+    angle = math.asin(wall_direction[1])
+    #wall_direction_prox = front_vector_prox - bottom_vector_prox
+    
+    #magnitude = np.linalg.norm(wall_direction_prox)
+    #if magnitude != 0:
+    #    wall_direction_prox = wall_direction_prox / magnitude
+
+    #angle_prox = math.asin(-wall_direction_prox[0])
+   
+    turn_dict = {
+        "not found" : 0,
+        "left" : 1,
+        "right" : 2,
+    }
+    next_turn_direction = 0
+
+    try:
+            
+        if (angle < -0.5) and (min(regions[225:494]) > (best_distance/2)) and not(min(regions[135:404]) < 0.3):
+            print "need to turn left"
+            next_turn_direction = 1
+        elif (min(regions[315:404]) < best_distance * 1.00) or (min(regions[135:314]) < 0.25):
+            print "need to turn right"
+            next_turn_direction = 2
+        else:
+            next_turn_direction = 0
+    except ValueError as error:
+        print "A value error ocoured"
+        print error 
+    
+
+
+
+def need_to_turn(): # Usar metodo vetorial: com o lidar estimar o angulo e distancia da parede supondo infinita, e achar a quina/fim
+    global wall_direction, regions, best_distance, next_turn_direction
+    turns = {
+        "none"  : 0,
+        "left"  : 1,
+        "right" : 2,
+    }
+    find_next_corner()
+    if (next_turn_direction == 0):# | (next_corner[1] > best_distance * 1.0):
+        print "no turns detected"
+        return 0
+    elif next_turn_direction == 1:
+        print "need to turn left"
+        return 1
+    elif next_turn_direction == 2:
+        print "need to turn right"
+        return 2
+    else:
+        print "Unknown turn state: "
+        print next_turn_direction
+
+
+def change_state(new_state):
+    global state, state_dict_
+    if new_state is not state:
+        print "Wall follower - [%s] - [%s]" % (new_state, state_dict_[new_state]) 
+        state = new_state
+
+
+def take_action(): #works only if wall is already found
+    global pub, wall_direction, bottom_vector_prox, front_vector_prox, state, best_distance, closest_point
+    #crating action parameters
+    angle  = -math.asin(wall_direction[1]) 
+    print angle
+    min_angle  = 0.1
+    distance_threshold = best_distance / 10.0
+    medium_distance = np.linalg.norm(closest_point)
+    distance_error = medium_distance - best_distance
+
+    #decision making
+    state_description = ""
+    if (distance_error < -distance_threshold) & (angle < -min_angle):
+        state_description = "Way too close to wall"
+        change_state(2)
+    elif ((distance_error < -distance_threshold) & ((angle < 0) & (angle > -min_angle))):
+        state_description = "getting too close to wall"
+        change_state(5)
+    elif (distance_error < distance_threshold) & (angle > 0): 
+        state_description = "close but getting far"
+        change_state(7)
+    elif ((distance_error < 0) & (distance_error > -distance_threshold)) & (angle < 0):
+        state_description = "kinda close and gettin closer"
+        change_state(6)
+    elif distance_error < 0: 
+        state_description = "kinda close but getting far"
+        change_state(7)
+    elif (distance_error > distance_threshold) & (angle > 0):
+        state_description = "getting too far"
+        change_state(3)
+    elif distance_error > distance_threshold:
+        state_description = "Far but getting close"
+        change_state(4)
+    elif ((distance_error > 0) & (distance_error < distance_threshold)) & (angle > 0):
+        state_description = "kinda far and getting far"
+        change_state(4)
+    elif distance_error > 0:
+        state_description = "kinda far but getting close"
+        change_state(7)
+    else:
+        state_description = "unknown state: \n\tmedium distance = %s\n\tangle = %s" % (medium_distance, angle)
+
+    print state_description
+
+
+def find_wall():
+    msg = Twist()
+    msg.linear.x = 0.2 * 10
+    msg.angular.z = 0.3 *10
+    return msg
+
+
+def turn_right():
+    msg = Twist()
+    msg.linear.x = 0.02 *10
+    msg.angular.z = -0.2 * 10
+    return msg
+
+
+def turn_left():
+    msg = Twist()
+    msg.linear.x = 0 #0.04 * 10
+    msg.angular.z = 0 #-0.25 * 10
+    return msg
+
+
+def adjust_left():
+    msg = Twist()
+    msg.linear.x = 0.15 * 10
+    msg.angular.z = 0.2 * 10
+    return msg
+
+
+def adjust_left_soft():
+    msg = Twist()
+    msg.linear.x = 0.2 * 10
+    msg.angular.z = 0.1 * 10
+    return msg
+
+
+def adjust_right():
+    msg = Twist()
+    msg.linear.x = 0.2 * 10
+    msg.angular.z = -0.1 * 10
+    return msg
+
+
+def adjust_right_soft():
+    msg = Twist()
+    msg.linear.x = 0.2 * 10
+    msg.angular.z = -0.05 * 10
+    return msg
+
+
+def go_straight():
+    msg = Twist()
+    msg.linear.x = 0.2 * 10
+    msg.angular.x = 0.0 * 10
+    return msg
+
+
+def main():
+    global pub, bottom_vector_prox, front_vector_prox, wall_direction, state, front_vector_lidar, back_vector_lidar
+
+    rospy.init_node('reading_laser')
+
+    pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+
+    sub_lidar = rospy.Subscriber('d_hospital/laser/scan', LaserScan, clbk_lidar)
+
+    sub_prox_bottom = rospy.Subscriber('back_left_prox', Range, clbk_prox_bottom)
+    sub_prox_front = rospy.Subscriber('front_left_prox', Range, clbk_prox_front)
+
+    rate = rospy.Rate(20)
+    while not rospy.is_shutdown():
+
+
+        find_wall_direction()
+        direction = need_to_turn()
+        if direction == 1:
+            change_state(1)
+        elif direction == 2:
+            change_state(2)
+        else: 
+            take_action()
+           
+        msg = Twist()
+
+        if state == 0:
+            msg =find_wall()
+        elif state == 1:
+            msg = turn_left()
+        elif state == 2:
+            msg = turn_right()
+        elif state == 3:
+            msg = adjust_left()
+        elif state == 4:
+            msg = adjust_left_soft()
+        elif state == 5:
+            msg = adjust_right()
+        elif state == 6:
+            msg = adjust_right_soft()
+        elif state == 7:
+            msg = go_straight()
+        else: 
+            print "unknown state: "
+            print state 
+       
+
+        pub.publish(msg)
+
+        rate.sleep()
+
+    #rospy.spin()
+
+
+if __name__ == '__main__':
+    main()
