@@ -276,8 +276,8 @@ def main():
 
     sub_lidar = rospy.Subscriber('d_hospital/laser/scan', LaserScan, clbk_lidar)
 
-    sub_prox_bottom = rospy.Subscriber('back_left_prox', Range, clbk_prox_bottom)
-    sub_prox_front = rospy.Subscriber('front_left_prox', Range, clbk_prox_front)
+    sub_prox_bottom = rospy.Subscriber('distance_sensor_back_left', Range, clbk_prox_bottom)
+    sub_prox_front = rospy.Subscriber('distance_sensor_front_left', Range, clbk_prox_front)
 
     rate = rospy.Rate(20)
     while not rospy.is_shutdown():
