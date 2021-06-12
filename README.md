@@ -16,5 +16,5 @@ sudo apt-get install ros-melodic-move-base
 ```
 
 ```
-sudo apt-get install ros-indigo-amcl
+sudo apt-get install ros-melodic-amcl
 ```
