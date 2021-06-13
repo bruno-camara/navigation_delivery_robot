@@ -30,6 +30,10 @@
     <remap from="scan" to="d_hospital/laser/scan"/>
     <param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/>
     <param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/>
+    
+    <param name="recovery_behavior_enabled" value="true"/>
+    <param name="clearing_rotation_allowed" value="true"/>
+    <param name="shutdown_costmaps" value="false"/>
   </node>
 
 
