@@ -18,7 +18,6 @@ def main():
     rate = rospy.Rate(CONTROL_RATE)
 
     distance_sensor_back = DistanceSensor("/distance_sensor_back")
-    distance_sensor_back = DistanceSensor("/distance_sensor_back")
     distance_sensor_back.initialise()
     print(distance_sensor_back)
 
