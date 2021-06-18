@@ -1,7 +1,7 @@
 # d_hospital_navigation
 > algoritmos de controle do robô hospitalar
 
-## 💥 How to Run
+## 💥 How to Run Simulation
 
 ```
 roslaunch d_hospital_gazebo spawn_in_hospital.launch
