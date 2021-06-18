@@ -32,21 +32,22 @@ front_vector_lidar = np.array([0.0, 0.0])
 back_vector_lidar = np.array([0.0, 0.0])
 
 
-#vetor da origem a parede na frente
+#vetor da origem a parede na frente pelo sensor de proximidade
 front_vector_prox = np.array([0.0, 0.0]) 
 
-#vetor da origem a parede atras
+#vetor da origem a parede atras pelo sensor de proximidade
 bottom_vector_prox = np.array([0.0, 0.0])
 
 #posicao dos sensores no sistema
 bottom_position = np.array([-0.22, -0.25])
-front_position = np.array([0.22, -0.25])
+front_position = np.array([-0.22, 0.25])
 #todos os sensores sao da esquerda
 
 wall_direction = np.array([0.0, 0.0])
+wall_direction_prox = np.array([0.0, 0.0])
 
 #distance robot will keep from wall
-best_distance = 0.5
+best_distance = 0.6
 closest_point = 0.0
 
 
@@ -59,15 +60,14 @@ def clbk_lidar(msg):
     global regions, front_vector_lidar, back_vector_lidar, closest_point
     for i in range(0, 719, 1):
         regions[i] = min(msg.ranges[i], 10)
-    #print (regions)
-    distance_to_wall = min(min(regions[361 : 719]), 20.0)
+    distance_to_wall = min(min(regions[495 : 719]), 20.0)
     closest_point = distance_to_wall*np.array([np.cos(math.radians((regions.index(distance_to_wall, 361)-180)/2)), 
                     np.sin(math.radians((regions.index(distance_to_wall, 361)-180)/2))])
-    #print closest_point
-    front_vector_lidar = np.array([min(regions[539 : 541]), 0.0])
+    
+    front_vector_lidar = np.array([min(regions[520:540]), 0.0]) #[539 : 541]
     ang_back = 30.0
     back_vector_lidar = np.array([regions[int(2*ang_back+540)]*np.cos((ang_back*np.pi)/180), regions[int(2*ang_back+540)]*np.sin((ang_back*np.pi)/180)])
-    #print back_vector_lidar
+    
     
     
     
@@ -75,36 +75,47 @@ def clbk_lidar(msg):
 def clbk_prox_bottom(msg):
     global bottom_vector_prox, bottom_position
     bottom_vector_prox = np.array([-msg.range, 0.0]) + bottom_position
-    #rospy.loginfo(bottom_vector_prox)
+    
 
 
 def clbk_prox_front(msg):
     global front_vector_prox, front_position
     front_vector_prox = np.array([-msg.range, 0.0]) + front_position
-    #rospy.loginfo(front_vector_prox)
+    
 
 
 def find_wall_direction():
-    global bottom_vector_prox, front_vector_prox, wall_direction, front_vector_lidar, back_vector_lidar, regions, closest_point
+    global bottom_vector_prox, front_vector_prox, wall_direction, wall_direction_prox, front_vector_lidar, back_vector_lidar, regions, closest_point
 
 
     #wall_direction = front_vector_prox - bottom_vector_prox
     distancia_normal = sum(regions[538 : 542])/5
     wall_direction = closest_point - np.array([distancia_normal, 0.0])
+    wall_direction_prox = front_vector_prox - bottom_vector_prox
     magnitude = np.linalg.norm(wall_direction)
+    magnitude_prox = np.linalg.norm(wall_direction_prox)
     if magnitude != 0:
         wall_direction = wall_direction / magnitude
-        print "Wall direction and angle"
-        print wall_direction
-        print math.degrees(math.asin(wall_direction[1]))
+        #print "Wall direction and angle"
+        #print wall_direction
+        #print math.degrees(math.asin(wall_direction[1]))
     else:
         print "magnitude == 0"
+
+    if magnitude_prox != 0:
+        wall_direction_prox = wall_direction_prox / magnitude_prox
+        #print "Wall direction prox and angle"
+        #print wall_direction_prox
+        #print math.degrees(math.asin(wall_direction_prox[0]))
+    else:
+        print "magnitude_prox == 0"
     #rospy.loginfo(wall_direction)
 
 def find_next_corner():
-    global wall_direction, regions, front_vector_prox, bottom_vector_prox, next_turn_direction, best_distance, front_vector_lidar, back_vector_lidar
+    global wall_direction, wall_direction_prox, regions, front_vector_prox, bottom_vector_prox, next_turn_direction, best_distance, front_vector_lidar, back_vector_lidar
 
     angle = math.asin(wall_direction[1])
+    angle_prox = math.asin(wall_direction_prox[0])
     #wall_direction_prox = front_vector_prox - bottom_vector_prox
     
     #magnitude = np.linalg.norm(wall_direction_prox)
@@ -121,11 +132,13 @@ def find_next_corner():
     next_turn_direction = 0
 
     try:
-            
-        if (angle < -0.5) and (min(regions[225:494]) > (best_distance/2)) and not(min(regions[135:404]) < 0.3):
+        distance_threshold = best_distance / 8.0
+        medium_distance = np.linalg.norm(closest_point)
+        distance_error = medium_distance - best_distance
+        if (angle > 10) and (distance_error > distance_threshold):
             print "need to turn left"
             next_turn_direction = 1
-        elif (min(regions[315:404]) < best_distance * 1.00) or (min(regions[135:314]) < 0.25):
+        elif (min(regions[315:404]) < 0.9 ) or (min(regions[135:314]) < 0.3): #best_distance * 1.5
             print "need to turn right"
             next_turn_direction = 2
         else:
@@ -166,40 +179,69 @@ def change_state(new_state):
         state = new_state
 
 
-def take_action(): #works only if wall is already found
-    global pub, wall_direction, bottom_vector_prox, front_vector_prox, state, best_distance, closest_point
-    #crating action parameters
-    angle  = -math.asin(wall_direction[1]) 
-    print angle
-    min_angle  = 0.1
-    distance_threshold = best_distance / 10.0
-    medium_distance = np.linalg.norm(closest_point)
-    distance_error = medium_distance - best_distance
+def is_in_window():
+    global wall_direction, wall_direction_prox, front_vector_prox, bottom_vector_prox
 
+    lidar_angle = math.degrees(math.asin(wall_direction[1]))
+    lidar_distance = min(regions[505:574]) - front_position[0]
+    #print lidar_distance
+
+    prox_angle = math.degrees(math.asin(wall_direction_prox[0]))
+    #print -front_vector_prox[0], -bottom_vector_prox[0]
+    prox_medium_distance = ((-front_vector_prox[0] - bottom_vector_prox[0]) / 2) - front_position[0]
+
+    if min((-front_vector_prox[0]), (-bottom_vector_prox[0])) - front_position[0] < ((lidar_distance) / 1.2) and min((-front_vector_prox[0], -bottom_vector_prox[0])) < (best_distance * 1.25): #and prox_medium_distance > best_distance / 1.5) or (False)
+        #print prox_medium_distance
+        return True
+    return False
+
+def take_action(): #works only if wall is already found
+    global pub, wall_direction, wall_direction_prox, bottom_vector_prox, front_vector_prox, state, best_distance, closest_point
+    #crating action parameters
+    min_angle  = 0.05
+    distance_threshold = best_distance / 15.0
+
+    if not(is_in_window()): #follow using lidar
+        angle  = -math.asin(wall_direction[1]) 
+        print "Using lidar"
+        print angle
+        medium_distance = np.linalg.norm(closest_point)
+        print medium_distance
+    else:                   #follow using proximity
+        angle  = -math.asin(wall_direction_prox[0]) 
+        print "Using prox"
+        print angle
+        medium_distance = (-front_vector_prox[0] - bottom_vector_prox[0]) / 2
+        print medium_distance
+
+
+    distance_error = medium_distance - best_distance
     #decision making
     state_description = ""
-    if (distance_error < -distance_threshold) & (angle < -min_angle):
+    
+
+    if ((distance_error < -distance_threshold) and (angle < -min_angle)):
         state_description = "Way too close to wall"
         change_state(2)
-    elif ((distance_error < -distance_threshold) & ((angle < 0) & (angle > -min_angle))):
+    elif ((distance_error < -distance_threshold) and ((angle < 0) & (angle > -min_angle))):
         state_description = "getting too close to wall"
         change_state(5)
-    elif (distance_error < distance_threshold) & (angle > 0): 
+    elif (distance_error < distance_threshold) and (angle > 0): 
         state_description = "close but getting far"
         change_state(7)
-    elif ((distance_error < 0) & (distance_error > -distance_threshold)) & (angle < 0):
+    elif ((distance_error < 0) and (distance_error > -distance_threshold)) & (angle < 0):
         state_description = "kinda close and gettin closer"
         change_state(6)
-    elif distance_error < 0: 
+    elif distance_error < 0 : 
         state_description = "kinda close but getting far"
         change_state(7)
-    elif (distance_error > distance_threshold) & (angle > 0):
+    elif (distance_error > distance_threshold) and (angle > 0) :
         state_description = "getting too far"
         change_state(3)
     elif distance_error > distance_threshold:
         state_description = "Far but getting close"
         change_state(4)
-    elif ((distance_error > 0) & (distance_error < distance_threshold)) & (angle > 0):
+    elif ((distance_error > 0) and (distance_error < distance_threshold)) & (angle > 0):
         state_description = "kinda far and getting far"
         change_state(4)
     elif distance_error > 0:
@@ -208,62 +250,64 @@ def take_action(): #works only if wall is already found
     else:
         state_description = "unknown state: \n\tmedium distance = %s\n\tangle = %s" % (medium_distance, angle)
 
+        
+
     print state_description
 
 
 def find_wall():
     msg = Twist()
-    msg.linear.x = 0.2 * 10
-    msg.angular.z = 0.3 *10
+    msg.linear.x = 0.2 * 1
+    msg.angular.z = 0.3 * 1
     return msg
 
 
 def turn_right():
     msg = Twist()
-    msg.linear.x = 0.02 *10
-    msg.angular.z = -0.2 * 10
+    msg.linear.x = 0.02 * 1
+    msg.angular.z = -0.2 * 1
     return msg
 
 
 def turn_left():
     msg = Twist()
-    msg.linear.x = 0 #0.04 * 10
-    msg.angular.z = 0 #-0.25 * 10
+    msg.linear.x = 0.04 * 1
+    msg.angular.z = -0.25 * 1
     return msg
 
 
 def adjust_left():
     msg = Twist()
-    msg.linear.x = 0.15 * 10
-    msg.angular.z = 0.2 * 10
+    msg.linear.x = 0.15 * 1
+    msg.angular.z = 0.2 * 1
     return msg
 
 
 def adjust_left_soft():
     msg = Twist()
-    msg.linear.x = 0.2 * 10
-    msg.angular.z = 0.1 * 10
+    msg.linear.x = 0.15 * 1
+    msg.angular.z = 0.2 * 1
     return msg
 
 
 def adjust_right():
     msg = Twist()
-    msg.linear.x = 0.2 * 10
-    msg.angular.z = -0.1 * 10
+    msg.linear.x = 0.2 * 1
+    msg.angular.z = -0.1 * 1
     return msg
 
 
 def adjust_right_soft():
     msg = Twist()
-    msg.linear.x = 0.2 * 10
-    msg.angular.z = -0.05 * 10
+    msg.linear.x = 0.2 * 1
+    msg.angular.z = -0.05 * 1
     return msg
 
 
 def go_straight():
     msg = Twist()
-    msg.linear.x = 0.2 * 10
-    msg.angular.x = 0.0 * 10
+    msg.linear.x = 0.2 * 1
+    msg.angular.x = 0.0 * 1
     return msg
 
 
