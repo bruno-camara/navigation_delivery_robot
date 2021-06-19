@@ -47,7 +47,7 @@ wall_direction = np.array([0.0, 0.0])
 wall_direction_prox = np.array([0.0, 0.0])
 
 #distance robot will keep from wall
-best_distance = 0.6
+best_distance = 0.5
 closest_point = 0.0
 
 
@@ -60,9 +60,9 @@ def clbk_lidar(msg):
     global regions, front_vector_lidar, back_vector_lidar, closest_point
     for i in range(0, 719, 1):
         regions[i] = min(msg.ranges[i], 10)
-    distance_to_wall = min(min(regions[495 : 719]), 20.0)
-    closest_point = distance_to_wall*np.array([np.cos(math.radians((regions.index(distance_to_wall, 361)-180)/2)), 
-                    np.sin(math.radians((regions.index(distance_to_wall, 361)-180)/2))])
+    distance_to_wall = min(min(regions[494 : 585]), 20.0)
+    closest_point = distance_to_wall*np.array([np.cos(math.radians((regions.index(distance_to_wall, 494, 585)-180)/2)), 
+                    np.sin(math.radians((regions.index(distance_to_wall, 494, 585)-180)/2))])
     
     front_vector_lidar = np.array([min(regions[520:540]), 0.0]) #[539 : 541]
     ang_back = 30.0
@@ -135,11 +135,15 @@ def find_next_corner():
         distance_threshold = best_distance / 8.0
         medium_distance = np.linalg.norm(closest_point)
         distance_error = medium_distance - best_distance
-        if (angle > 10) and (distance_error > distance_threshold):
+        print min(regions[315:404])
+
+        
+        if (min(regions[540:545]) > best_distance * 1.5) and regions.index(min(regions[405:585]), 405, 585) >= 540:
             print "need to turn left"
             next_turn_direction = 1
         elif (min(regions[315:404]) < 0.9 ) or (min(regions[135:314]) < 0.3): #best_distance * 1.5
             print "need to turn right"
+            
             next_turn_direction = 2
         else:
             next_turn_direction = 0
@@ -214,7 +218,6 @@ def take_action(): #works only if wall is already found
         medium_distance = (-front_vector_prox[0] - bottom_vector_prox[0]) / 2
         print medium_distance
 
-
     distance_error = medium_distance - best_distance
     #decision making
     state_description = ""
@@ -272,7 +275,7 @@ def turn_right():
 def turn_left():
     msg = Twist()
     msg.linear.x = 0.04 * 1
-    msg.angular.z = -0.25 * 1
+    msg.angular.z = 0.25 * 1
     return msg
 
 
