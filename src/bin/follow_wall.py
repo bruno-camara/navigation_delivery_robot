@@ -58,8 +58,9 @@ next_turn_direction = 0
 
 def clbk_lidar(msg):
     global regions, front_vector_lidar, back_vector_lidar, closest_point
-    for i in range(0, 719, 1):
+    for i in range(0, 720, 1):
         regions[i] = min(msg.ranges[i], 10)
+    print regions
     distance_to_wall = min(min(regions[494 : 585]), 20.0)
     closest_point = distance_to_wall*np.array([np.cos(math.radians((regions.index(distance_to_wall, 494, 585)-180)/2)), 
                     np.sin(math.radians((regions.index(distance_to_wall, 494, 585)-180)/2))])
