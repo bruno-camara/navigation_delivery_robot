@@ -12,6 +12,8 @@ from nav_msgs.msg import Odometry
 from tf import transformations
 from std_srvs.srv import *
 
+from .lib.lidar_sensor import LidarSensor
+
 import math
 pub = None
 
@@ -56,18 +58,18 @@ regions = [0.0] * 720
 next_turn_direction = 0
 
 
-def clbk_lidar(msg):
-    global regions, front_vector_lidar, back_vector_lidar, closest_point
-    for i in range(0, 720, 1):
-        regions[i] = min(msg.ranges[i], 10)
-    print regions
-    distance_to_wall = min(min(regions[494 : 585]), 20.0)
-    closest_point = distance_to_wall*np.array([np.cos(math.radians((regions.index(distance_to_wall, 494, 585)-180)/2)), 
-                    np.sin(math.radians((regions.index(distance_to_wall, 494, 585)-180)/2))])
-    
-    front_vector_lidar = np.array([min(regions[520:540]), 0.0]) #[539 : 541]
-    ang_back = 30.0
-    back_vector_lidar = np.array([regions[int(2*ang_back+540)]*np.cos((ang_back*np.pi)/180), regions[int(2*ang_back+540)]*np.sin((ang_back*np.pi)/180)])
+#def clbk_lidar(msg):
+#    global regions, front_vector_lidar, back_vector_lidar, closest_point
+#    for i in range(0, 720, 1):
+#        regions[i] = min(msg.ranges[i], 10)
+#    print regions
+#    distance_to_wall = min(min(regions[494 : 585]), 20.0)
+#    closest_point = distance_to_wall*np.array([np.cos(math.radians((regions.index(distance_to_wall, 494, 585)-180)/2)), 
+#                    np.sin(math.radians((regions.index(distance_to_wall, 494, 585)-180)/2))])
+#    
+#    front_vector_lidar = np.array([min(regions[520:540]), 0.0]) #[539 : 541]
+#    ang_back = 30.0
+#    back_vector_lidar = np.array([regions[int(2*ang_back+540)]*np.cos((ang_back*np.pi)/180), regions[int(2*ang_back+540)]*np.sin((ang_back*np.pi)/180)])
     
     
     
@@ -90,8 +92,8 @@ def find_wall_direction():
 
 
     #wall_direction = front_vector_prox - bottom_vector_prox
-    distancia_normal = sum(regions[538 : 542])/5
-    wall_direction = closest_point - np.array([distancia_normal, 0.0])
+    distancia_normal = lidar.get_normal_distance_left() #sum(regions[538 : 542])/5
+    wall_direction = lidar.get_closest_point(22.5, 67.5) - lidar.get_normal_point_left() #closest_point - np.array([distancia_normal, 0.0])
     wall_direction_prox = front_vector_prox - bottom_vector_prox
     magnitude = np.linalg.norm(wall_direction)
     magnitude_prox = np.linalg.norm(wall_direction_prox)
@@ -136,13 +138,13 @@ def find_next_corner():
         distance_threshold = best_distance / 8.0
         medium_distance = np.linalg.norm(closest_point)
         distance_error = medium_distance - best_distance
-        print min(regions[315:404])
+        print min(lidar.get_closest_distance(-22.5, 22.5))
 
         
-        if (min(regions[540:545]) > best_distance * 1.5) and regions.index(min(regions[405:585]), 405, 585) >= 540:
+        if lidar.get_closest_distance(90, 93) > best_distance * 1.5 and lidar.get_closest_point_angle(22.5, 112.5) >= 90: #(min(regions[540:545]) > best_distance * 1.5) and regions.index(min(regions[405:585]), 405, 585) >= 540:
             print "need to turn left"
             next_turn_direction = 1
-        elif (min(regions[315:404]) < 0.9 ) or (min(regions[135:314]) < 0.3): #best_distance * 1.5
+        elif lidar.get_closest_distance(-22.5, 22.5) < 0.9 or lidar.get_closest_distance(-112.5, -23) <0.3:#(min(regions[315:404]) < 0.9 ) or (min(regions[135:314]) < 0.3): #best_distance * 1.5
             print "need to turn right"
             
             next_turn_direction = 2
@@ -188,7 +190,7 @@ def is_in_window():
     global wall_direction, wall_direction_prox, front_vector_prox, bottom_vector_prox
 
     lidar_angle = math.degrees(math.asin(wall_direction[1]))
-    lidar_distance = min(regions[505:574]) - front_position[0]
+    lidar_distance = lidar.get_closest_distance(72.5, 107) - front_position[0] #min(regions[505:574]) - front_position[0]
     #print lidar_distance
 
     prox_angle = math.degrees(math.asin(wall_direction_prox[0]))
@@ -210,7 +212,7 @@ def take_action(): #works only if wall is already found
         angle  = -math.asin(wall_direction[1]) 
         print "Using lidar"
         print angle
-        medium_distance = np.linalg.norm(closest_point)
+        medium_distance = lidar.get_closest_distance(67, 112.5)#np.linalg.norm(closest_point)
         print medium_distance
     else:                   #follow using proximity
         angle  = -math.asin(wall_direction_prox[0]) 
@@ -318,11 +320,13 @@ def go_straight():
 def main():
     global pub, bottom_vector_prox, front_vector_prox, wall_direction, state, front_vector_lidar, back_vector_lidar
 
-    rospy.init_node('reading_laser')
-
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
 
-    sub_lidar = rospy.Subscriber('d_hospital/laser/scan', LaserScan, clbk_lidar)
+    rospy.init_node('reading_laser')
+    #sub_lidar = rospy.Subscriber('d_hospital/laser/scan', LaserScan, clbk_lidar)
+    lidar = LidarSensor('d_hospital/laser/scan')
+    lidar.initialise()
+    print(lidar)
 
     sub_prox_bottom = rospy.Subscriber('distance_sensor_back_left', Range, clbk_prox_bottom)
     sub_prox_front = rospy.Subscriber('distance_sensor_front_left', Range, clbk_prox_front)

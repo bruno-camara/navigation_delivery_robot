@@ -129,5 +129,19 @@ class LidarSensor:
                 gives the array taken in -90 degrees """
         return self.normal_point_right
         pass
+    
+    def get_closest_point_angle(self, min_angle, max_angle):
+        """ Description:
+                gives the angle of closest point in a given angle range """
+        """ Args:
+                self, start angle, stop angle: given in degrees, 0 is in front of LIDAR,
+                counter clockwise is positive """
+        start_data = 360 + 2 * min_angle
+        stop_data = 360 + 2 * max_angle
+        index = self.regions.index(min(self.regions[start_data, stop_data]), start_data, stop_data)
+        angle = (index - 360) / 2
+        return angle
+        pass
+    
 
         
