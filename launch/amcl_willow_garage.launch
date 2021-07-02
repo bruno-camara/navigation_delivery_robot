@@ -1,44 +1,46 @@
-<?xml version="1.0"?>
 <launch>
-  <master auto="start"/>
+  <!-- Arguments -->
+  <arg name="scan_topic"     default="/d_hospital/laser/scan"/>
+  <arg name="initial_pose_x" default="0.0"/>
+  <arg name="initial_pose_y" default="0.0"/>
+  <arg name="initial_pose_a" default="0.0"/>
 
-  <!-- Map server -->
-  <arg name="map_file" default="$(find d_hospital_navigation)/maps/willow_garage_map.yaml"/>
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
+  <!-- AMCL -->
+  <node pkg="amcl" type="amcl" name="amcl">
 
-  <!-- Place map frame at odometry frame -->
-  <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0 0 0 0 0 0 map odom 100"/>
+    <param name="min_particles"             value="500"/>
+    <param name="max_particles"             value="3000"/>
+    <param name="kld_err"                   value="0.02"/>
+    <param name="update_min_d"              value="0.20"/>
+    <param name="update_min_a"              value="0.20"/>
+    <param name="resample_interval"         value="1"/>
+    <param name="transform_tolerance"       value="0.5"/>
+    <param name="recovery_alpha_slow"       value="0.00"/>
+    <param name="recovery_alpha_fast"       value="0.00"/>
+    <param name="initial_pose_x"            value="$(arg initial_pose_x)"/>
+    <param name="initial_pose_y"            value="$(arg initial_pose_y)"/>
+    <param name="initial_pose_a"            value="$(arg initial_pose_a)"/>
+    <param name="gui_publish_rate"          value="50.0"/>
 
-  <!-- Localization -->
-  <node pkg="amcl" type="amcl" name="amcl" output="screen">
-    <remap from="scan" to="d_hospital/laser/scan"/>
-    <param name="odom_frame_id" value="odom"/>
-    <param name="odom_model_type" value="diff-corrected"/>
-    <param name="base_frame_id" value="base"/>
-    <param name="update_min_d" value="0.2"/>
-    <param name="update_min_a" value="0.1"/>
-    <param name="laser_max_beams" value="100"/>
-    <param name="recovery_alpha_slow" value="0.001"/>
-    <param name="recovery_alpha_fast" value="0.1"/>
-    <param name="first_map_only" value="false"/>
+    <remap from="scan"                      to="$(arg scan_topic)"/>
+    <param name="laser_max_range"           value="3.5"/>
+    <param name="laser_max_beams"           value="180"/>
+    <param name="laser_z_hit"               value="0.5"/>
+    <param name="laser_z_short"             value="0.05"/>
+    <param name="laser_z_max"               value="0.05"/>
+    <param name="laser_z_rand"              value="0.5"/>
+    <param name="laser_sigma_hit"           value="0.2"/>
+    <param name="laser_lambda_short"        value="0.1"/>
+    <param name="laser_likelihood_max_dist" value="2.0"/>
+    <param name="laser_model_type"          value="likelihood_field"/>
+
+    <param name="odom_model_type"           value="diff"/>
+    <param name="odom_alpha1"               value="0.1"/>
+    <param name="odom_alpha2"               value="0.1"/>
+    <param name="odom_alpha3"               value="0.1"/>
+    <param name="odom_alpha4"               value="0.1"/>
+    <param name="odom_frame_id"             value="odom"/>
+    <param name="base_frame_id"             value="base"/>
+
   </node>
-  <!--include file="$(find amcl)/examples/amcl_omni.launch"/-->
-
-  <!-- Move base -->
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <rosparam file="$(find d_hospital_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap"/>
-    <rosparam file="$(find d_hospital_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap"/>
-    <rosparam file="$(find d_hospital_navigation)/config/local_costmap_params.yaml" command="load"/>
-    <rosparam file="$(find d_hospital_navigation)/config/global_costmap_params.yaml" command="load"/>
-    <rosparam file="$(find d_hospital_navigation)/config/base_local_planner_params.yaml" command="load"/>
-    <remap from="cmd_vel" to="cmd_vel"/>
-    <remap from="odom" to="odom"/>
-    <remap from="scan" to="d_hispital/laser/scan"/>
-    <param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/>
-    <param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/>
-    <param name="recovery_behavior_enabled" value="true"/>
-    <param name="clearing_rotation_allowed" value="true"/>
-    <param name="shutdown_costmaps" value="false"/>
-  </node>
-
 </launch>
