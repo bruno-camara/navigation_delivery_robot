@@ -4,7 +4,7 @@ footprint: [[0.38, 0.21], [0.38, -0.21], [-0.38, -0.21], [-0.38, 0.21]]
 footprint_padding: 0.1
 #robot_radius: ir_of_robot
 #robot_radius: 0.4 # distance a circular robot should be clear of the obstacle
-inflation_radius: 2
+inflation_radius: 0.3
 cost_scaling_factor: 0.7
 
 map_type: costmap

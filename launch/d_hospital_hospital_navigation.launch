@@ -1,6 +1,6 @@
 <launch>
   <!-- Arguments -->
-  <arg name="map_file" default="$(find d_hospital_navigation)/maps/willow_garage_map.yaml"/>
+  <arg name="map_file" default="$(find d_hospital_navigation)/maps/hospital_map.yaml"/>
 
 
 
