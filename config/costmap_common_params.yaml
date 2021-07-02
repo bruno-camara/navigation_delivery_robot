@@ -11,6 +11,10 @@ observation_sources: laser_scan_sensor #point_cloud_sensor
 
 # marking - add obstacle information to cost map
 # clearing - clear obstacle information to cost map
-laser_scan_sensor: {sensor_frame: d_hospital/laser, data_type: LaserScan, topic: d_hospital/laser/scan, marking: true, clearing: true}
+laser_scan_sensor: {sensor_frame: link_lidar,
+                    data_type: LaserScan, 
+                    topic: d_hospital/laser/scan,
+                    marking: true,
+                    clearing: true}
 
 #point_cloud_sensor: {sensor_frame: frame_name, data_type: PointCloud, topic: topic_name, marking: true, clearing: true}
