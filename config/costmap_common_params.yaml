@@ -19,4 +19,5 @@ laser_scan_sensor: {sensor_frame: link_lidar,
                     clearing: true
                     }
 
+
 #point_cloud_sensor: {sensor_frame: frame_name, data_type: PointCloud, topic: topic_name, marking: true, clearing: true}
