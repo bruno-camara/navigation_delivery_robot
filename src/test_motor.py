@@ -4,8 +4,8 @@
     File:
         motor.py
     Description:
-        test for motor 
- 
+        test for motor
+
 """
 import rospy
 from lib.motor import MotorControl
@@ -19,6 +19,7 @@ def main_read():
     motor_back=MotorControl("/cmd_vel")
     motor_back.initialise()
     print(motor_back)
+
     while not rospy.is_shutdown():
         print("velocity",motor_back.get_velocity())
         print("rotation",motor_back.get_rotation())
@@ -34,15 +35,15 @@ def main_set():
     print(motor_back)
 
     while not rospy.is_shutdown():
-        print("setting velocity 15",motor_back.set_velocity(0.1))
-        print("setting rotation 15",motor_back.set_rotation(0.1))
+        print("setting velocity 0.1",motor_back.set_velocity(0.1))
+        print("setting rotation 0.1",motor_back.set_rotation(0.1))
         rate.sleep()
         pass
 pass
 
 if __name__ == "__main__":
     try:
-        main_read()
+        main_set()
         pass
     except rospy.ROSInterruptException:
         pass
