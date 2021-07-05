@@ -1,0 +1,19 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="map_file" default="$(find d_hospital_navigation)/maps/hospital_map.yaml"/>
+
+
+
+  <!-- Map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
+
+
+  <!-- AMCL -->
+  <include file="$(find d_hospital_navigation)/launch/amcl_d_hospital.launch"/>
+
+  <!-- move_base -->
+  <include file="$(find d_hospital_navigation)/launch/move_base_d_hospital.launch">
+  </include>
+
+
+</launch>
