@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+"""
+    File:
+        test_set_goal_example.py
+    Description:
+        test set_goal 
+    Author:
+        Bruno <@usp.br>
+"""
+
 import rospy
 import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
