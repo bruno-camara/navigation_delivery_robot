@@ -2,9 +2,9 @@
 
 """
     File:
-        test_set_goal_example.py
+        set_goal.py
     Description:
-        test set_goal 
+        Set desired goal position 
     Author:
         Bruno <@usp.br>
 """
@@ -14,12 +14,11 @@ import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 
 class SetGoal:
-    def __init__(self, des_x, des_y):
-        self.des_x = des_x
-        self.des_y = des_y
+    def __init__(self):
+        self.goal = MoveBaseGoal()
 
     def __str__(self):
-        return 'Goal: ({x}, {y})' .format(x = self.des_x, y = self.des_y)
+        return 'Call Go function passing position coordinates and orientation coordinates as parameters'
 
     # Callbacks definition
 
@@ -37,26 +36,30 @@ class SetGoal:
         if status == 4:
             rospy.loginfo("Goal aborted")
 
-    def go(self):
-        rospy.init_node('send_goal')
-
+    def go(self, des_pos_x, des_pos_y, des_pos_z, des_ori_x, des_ori_y, des_ori_z, des_ori_w):
+        '''
+        Description: 
+        Get the robot to the desired goal
+        Args:
+        desired position for x, y and z
+        desired orientation for x, y, z and w as quaternation in radians
+        '''
+        
         navclient = actionlib.SimpleActionClient('move_base',MoveBaseAction)
         navclient.wait_for_server()
 
-        # Example of navigation goal
-        goal = MoveBaseGoal()
-        goal.target_pose.header.frame_id = "map"
-        goal.target_pose.header.stamp = rospy.Time.now()
+        self.goal.target_pose.header.frame_id = "map"
+        self.goal.target_pose.header.stamp = rospy.Time.now()
 
-        goal.target_pose.pose.position.x = self.des_x
-        goal.target_pose.pose.position.y = self.des_y
-        goal.target_pose.pose.position.z = 0.0
-        goal.target_pose.pose.orientation.x = 0.0
-        goal.target_pose.pose.orientation.y = 0.0
-        goal.target_pose.pose.orientation.z = 0.662
-        goal.target_pose.pose.orientation.w = 0.750
+        self.goal.target_pose.pose.position.x = des_pos_x
+        self.goal.target_pose.pose.position.y = des_pos_y
+        self.goal.target_pose.pose.position.z = des_pos_z
+        self.goal.target_pose.pose.orientation.x = des_ori_x
+        self.goal.target_pose.pose.orientation.y = des_ori_y
+        self.goal.target_pose.pose.orientation.z = des_ori_z #0.662
+        self.goal.target_pose.pose.orientation.w = des_ori_w #0.750
 
-        navclient.send_goal(goal, self.done_cb, self.active_cb, self.feedback_cb)
+        navclient.send_goal(self.goal, self.done_cb, self.active_cb, self.feedback_cb)
         finished = navclient.wait_for_result()
 
         if not finished:
