@@ -22,7 +22,7 @@ class SetGoal:
 
     # Callbacks definition
 
-    def active_cb(self, extra):
+    def active_cb(self):
         rospy.loginfo("Goal pose being processed")
 
     def feedback_cb(self, feedback):
