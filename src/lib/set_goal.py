@@ -58,14 +58,8 @@ class SetGoal:
             rospy.loginfo("Goal aborted")
 
     def stop(self):
-        print('entrei na funcao stop')
-        #self.cancel_msg = GoalID(stamp=rospy.Time.from_sec(0.0), id="")
-        #self.cancel_msg = GoalID() #Empty Goal to cancel the motion action
-        #self.cancel_pub.publish(self.cancel_msg)
-
         self.navclient.cancel_goal()
 
-        print('sai funcao stop')
 
     def go(self, des_pos_x, des_pos_y, des_pos_z, des_ori_x, des_ori_y, des_ori_z, des_ori_w):
         '''

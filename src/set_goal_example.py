@@ -25,13 +25,14 @@ def main():
     des_goal.initialise()
     print(des_goal.__str__())
     
-    des_goal.go(0, 0, 0, 0, 0, 0.662, 0.750)
+    des_goal.go(4, 0, 0, 0, 0, 0.662, 0.750)
 
-    
+
     while not rospy.is_shutdown():
-        if rospy.is_shutdown():
-            print("dentro if rospy.is_shutdown()")
+        key = int(input("Choose a command: "))
+        if (key == 1):
             des_goal.stop()
+        elif(key == 2):
             break
         
 
