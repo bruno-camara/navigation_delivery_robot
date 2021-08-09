@@ -8,19 +8,39 @@
     Author:
         Bruno <@usp.br>
 """
-
+# ros libs
 import rospy
 import actionlib
+
+#msg ros libs
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from geometry_msgs.msg import Twist
+from actionlib_msgs.msg import GoalID, GoalStatusArray
+from nav_msgs.msg import Odometry
+
+#internal libs
+from motor import MotorControl
 
 class SetGoal:
     def __init__(self):
         self.goal = MoveBaseGoal()
+        #self.status = -1
+        #self.pose = Odometry()
 
     def __str__(self):
         return 'Call Go function passing position coordinates and orientation coordinates as parameters'
 
     # Callbacks definition
+
+    def initialise(self):
+        self.cancel_pub = rospy.Publisher('/move_base/cancel', GoalID, queue_size=1)
+        self.navclient = actionlib.SimpleActionClient("/move_base", MoveBaseAction)
+
+        rospy.loginfo("Waiting for move_base action server...")
+        # Wait 60 seconds for the action server to become available
+        self.navclient.wait_for_server(rospy.Duration(60))
+        rospy.loginfo("Connected to move base server")
+        rospy.loginfo("Starting move base goals smoother")
 
     def active_cb(self):
         rospy.loginfo("Goal pose being processed")
@@ -36,6 +56,16 @@ class SetGoal:
         if status == 4:
             rospy.loginfo("Goal aborted")
 
+    def stop(self):
+        print('entrei na funcao stop')
+
+        #cancel_msg = GoalID() #Empty Goal to cancel the motion action
+        #self.cancel_pub.publish(cancel_msg)
+        
+        self.navclient.cancel_all_goals()
+
+        print('sai funcao stop')
+
     def go(self, des_pos_x, des_pos_y, des_pos_z, des_ori_x, des_ori_y, des_ori_z, des_ori_w):
         '''
         Description: 
@@ -44,9 +74,6 @@ class SetGoal:
         desired position for x, y and z
         desired orientation for x, y, z and w as quaternation in radians
         '''
-        
-        navclient = actionlib.SimpleActionClient('move_base',MoveBaseAction)
-        navclient.wait_for_server()
 
         self.goal.target_pose.header.frame_id = "map"
         self.goal.target_pose.header.stamp = rospy.Time.now()
@@ -59,10 +86,14 @@ class SetGoal:
         self.goal.target_pose.pose.orientation.z = des_ori_z #0.662
         self.goal.target_pose.pose.orientation.w = des_ori_w #0.750
 
-        navclient.send_goal(self.goal, self.done_cb, self.active_cb, self.feedback_cb)
-        finished = navclient.wait_for_result()
+        self.navclient.send_goal(self.goal, self.done_cb, self.active_cb, self.feedback_cb) 
+    
+        #navclient.cancel_all_goals() #Nao funciona - naso sei o motivo
 
-        if not finished:
-            rospy.logerr("Action server not available!")
-        else:
-            rospy.loginfo ( navclient.get_result())
+        #navclient.cancel_goal() #Nao funciona
+
+        #rospy.logerr("Action server not available!")
+
+        rospy.loginfo (self.navclient.get_result())
+
+        
