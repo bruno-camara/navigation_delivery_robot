@@ -22,9 +22,10 @@ from nav_msgs.msg import Odometry
 from motor import MotorControl
 
 class SetGoal:
-    def __init__(self):
+    def __init__(self, topic_name):
+        ''' topic_name(string):topic name to move_base '''
         self.goal = MoveBaseGoal()
-    
+        self.topic_name = topic_name
 
     def __str__(self):
         return 'Call Go function passing position coordinates and orientation coordinates as parameters'
@@ -32,8 +33,7 @@ class SetGoal:
     # Callbacks definition
 
     def initialise(self):
-        self.navclient = actionlib.simple_action_client.SimpleActionClient("/move_base", MoveBaseAction)
-
+        self.navclient = actionlib.simple_action_client.SimpleActionClient(self.topic_name, MoveBaseAction)
         rospy.loginfo("Waiting for move_base action server...")
         # Wait 60 seconds for the action server to become available
         self.navclient.wait_for_server(rospy.Duration(20))
@@ -44,7 +44,7 @@ class SetGoal:
         rospy.loginfo("Goal pose being processed")
 
     def feedback_cb(self, feedback):
-        rospy.loginfo("Current location: "+str(feedback.base_position.pose))
+        rospy.loginfo("Current location: "+str(feedback.base_position.pose)+"\nPress s to stop or q to quit\n")
 
     def done_cb(self, status, result):
         if status == 3:
