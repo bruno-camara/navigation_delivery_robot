@@ -24,6 +24,7 @@ from motor import MotorControl
 class SetGoal:
     def __init__(self):
         self.goal = MoveBaseGoal()
+        self.cancel_msg = {}
         #self.status = -1
         #self.pose = Odometry()
 
@@ -33,12 +34,12 @@ class SetGoal:
     # Callbacks definition
 
     def initialise(self):
-        self.cancel_pub = rospy.Publisher('/move_base/cancel', GoalID, queue_size=1)
-        self.navclient = actionlib.SimpleActionClient("/move_base", MoveBaseAction)
+        self.cancel_pub = rospy.Publisher("/move_base/cancel", GoalID, queue_size=10)
+        self.navclient = actionlib.simple_action_client.SimpleActionClient("/move_base", MoveBaseAction)
 
         rospy.loginfo("Waiting for move_base action server...")
         # Wait 60 seconds for the action server to become available
-        self.navclient.wait_for_server(rospy.Duration(60))
+        self.navclient.wait_for_server(rospy.Duration(20))
         rospy.loginfo("Connected to move base server")
         rospy.loginfo("Starting move base goals smoother")
 
@@ -58,11 +59,11 @@ class SetGoal:
 
     def stop(self):
         print('entrei na funcao stop')
+        #self.cancel_msg = GoalID(stamp=rospy.Time.from_sec(0.0), id="")
+        #self.cancel_msg = GoalID() #Empty Goal to cancel the motion action
+        #self.cancel_pub.publish(self.cancel_msg)
 
-        #cancel_msg = GoalID() #Empty Goal to cancel the motion action
-        #self.cancel_pub.publish(cancel_msg)
-        
-        self.navclient.cancel_all_goals()
+        self.navclient.cancel_goal()
 
         print('sai funcao stop')
 

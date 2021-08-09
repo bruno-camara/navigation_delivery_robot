@@ -27,6 +27,7 @@ def main():
     
     des_goal.go(0, 0, 0, 0, 0, 0.662, 0.750)
 
+    
     while not rospy.is_shutdown():
         if rospy.is_shutdown():
             print("dentro if rospy.is_shutdown()")
