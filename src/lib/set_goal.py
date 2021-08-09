@@ -24,9 +24,7 @@ from motor import MotorControl
 class SetGoal:
     def __init__(self):
         self.goal = MoveBaseGoal()
-        self.cancel_msg = {}
-        #self.status = -1
-        #self.pose = Odometry()
+    
 
     def __str__(self):
         return 'Call Go function passing position coordinates and orientation coordinates as parameters'
@@ -34,7 +32,6 @@ class SetGoal:
     # Callbacks definition
 
     def initialise(self):
-        self.cancel_pub = rospy.Publisher("/move_base/cancel", GoalID, queue_size=10)
         self.navclient = actionlib.simple_action_client.SimpleActionClient("/move_base", MoveBaseAction)
 
         rospy.loginfo("Waiting for move_base action server...")
@@ -47,7 +44,7 @@ class SetGoal:
         rospy.loginfo("Goal pose being processed")
 
     def feedback_cb(self, feedback):
-        rospy.loginfo("Current location: "+str(feedback))
+        rospy.loginfo("Current location: "+str(feedback.base_position.pose))
 
     def done_cb(self, status, result):
         if status == 3:
@@ -59,7 +56,6 @@ class SetGoal:
 
     def stop(self):
         self.navclient.cancel_goal()
-
 
     def go(self, des_pos_x, des_pos_y, des_pos_z, des_ori_x, des_ori_y, des_ori_z, des_ori_w):
         '''
@@ -82,12 +78,6 @@ class SetGoal:
         self.goal.target_pose.pose.orientation.w = des_ori_w #0.750
 
         self.navclient.send_goal(self.goal, self.done_cb, self.active_cb, self.feedback_cb) 
-    
-        #navclient.cancel_all_goals() #Nao funciona - naso sei o motivo
-
-        #navclient.cancel_goal() #Nao funciona
-
-        #rospy.logerr("Action server not available!")
 
         rospy.loginfo (self.navclient.get_result())
 

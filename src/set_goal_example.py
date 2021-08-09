@@ -10,10 +10,7 @@
 """
 
 import rospy
-
 from lib.set_goal import SetGoal
-from geometry_msgs.msg import Twist
-from actionlib_msgs.msg import GoalID
 
 CONTROL_RATE = 60  # Hz
 
@@ -27,12 +24,11 @@ def main():
     
     des_goal.go(4, 0, 0, 0, 0, 0.662, 0.750)
 
-
     while not rospy.is_shutdown():
-        key = int(input("Choose a command: "))
-        if (key == 1):
+        key = raw_input("Choose a command - s for stop and q for quit: \n")
+        if (key == 's'):
             des_goal.stop()
-        elif(key == 2):
+        elif(key == 'q'):
             break
         
 
