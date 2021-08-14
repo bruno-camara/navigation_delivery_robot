@@ -11,9 +11,22 @@ roslaunch d_hospital_gazebo spawn_in_hospital.launch
 roslaunch d_hospital_gazebo display.launch
 ```
 
+Then
 ```
 roslaunch d_hospital_navigation d_hospital_willow_navigation.launch
 ```
+Or
+```
+ rosrun joy joy_node
+```
+```
+rosrun d_hospital_navigation joy_xbox_nav.py
+```
+Or
+```
+rosrun d_hospital_navigation keyboard_nav.py
+```
+
 
 
 ## 📦 Requeriments
