@@ -37,3 +37,7 @@ sudo apt-get install ros-melodic-amcl
 ```
 sudo apt-get install ros-melodic-dwa-local-planner
 ```
+
+´´´
+sudo apt-get install ros-melodic-joy
+´´´
