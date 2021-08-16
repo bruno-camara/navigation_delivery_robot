@@ -5,7 +5,7 @@
     File:
         joystyck_xbox.py
     Description:
-        Control the robot using a Xbox wired controller
+        Xbox wired controller class
     Author:
         Pedro Croso <pedrocroso@usp.br>
 """

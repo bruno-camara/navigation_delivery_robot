@@ -1,6 +1,16 @@
 #! /usr/bin/env python
 # import ros stuff
 
+"""
+    File:
+        joystyck_xbox.py
+    Description:
+        Control the robot using a Xbox wired controller
+    Author:
+        Pedro Croso <pedrocroso@usp.br>
+"""
+
+
 from motor import MotorControl
 import rospy
 from joystick_xbox import XboxController
