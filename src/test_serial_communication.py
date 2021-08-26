@@ -19,6 +19,7 @@ def main():
     communication = SerialCommunication(PORT)
     communication.initialise()
 
+    #flood of tests
     communication.send_data('10001')
     communication.send_data('11001')
     communication.send_data('10001')
