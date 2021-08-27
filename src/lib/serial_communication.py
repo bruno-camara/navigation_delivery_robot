@@ -23,13 +23,11 @@ class SerialCommunication:
         self.port = port
 
     def __str__(self):
-        """ Description:
-                 """
+        """ Description:"""
         return 'comunicação serial na porta {port}'.format(port = self.port)
 
     def initialise(self):
-        """ Description:
-            """
+        """ Description:"""
         self.usb_port = serial.Serial(port=self.port, baudrate=9600, timeout=1)
 
     def finalize(self):
@@ -57,4 +55,4 @@ class SerialCommunication:
             Args:"""
         self.read_data()
         if self.usb_port.isOpen():
-                self.usb_port.write(data+'\r\n')
+            self.usb_port.write(data+'\r\n')
