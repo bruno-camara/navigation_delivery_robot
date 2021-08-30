@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# coding=utf-8
 import rospy
 from lib.motor import MotorControl
 from lib.serial_communication import SerialCommunication
@@ -23,8 +25,10 @@ communication = SerialCommunication(PORT)
 
 def robot_manual_controller(debug = False):
     #motor delcaration
-    rospy.init_node('test_robot_manual_controller', anonymous=True)
+    rospy.init_node('robot_manual_controller', anonymous=True)
     rate = rospy.Rate(CONTROL_RATE)
+
+    
     motor_back=MotorControl("/cmd_vel")
     motor_back.initialise()
 
@@ -38,6 +42,7 @@ def robot_manual_controller(debug = False):
     isvel = True
 
     while not rospy.is_shutdown():
+
         if (motor_back.get_velocity()._type == 'geometry_msgs/Vector3'):
             info_serial_vel = int(map(motor_back.get_velocity().x,MIN,MAX,NEW_MIN,NEW_MAX))
             info_serial_rot = int(map(motor_back.get_rotation().z,MIN,MAX,NEW_MIN,NEW_MAX))
@@ -64,8 +69,9 @@ def robot_manual_controller(debug = False):
 
 if __name__ == "__main__":
     try:
+
         robot_manual_controller(debug = True)
-        pass
+
     except rospy.ROSInterruptException:
         communication.finalize()
         pass
