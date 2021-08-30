@@ -14,7 +14,7 @@
 import rospy
 from lib.serial_communication import SerialCommunication
 
-PORT = "/dev/ttyUSB1000"
+PORT = "/dev/ttyUSB0"
 
 def main():
     communication = SerialCommunication(PORT)
