@@ -26,7 +26,7 @@ rosrun d_hospital_navigation joy_xbox_nav.py
 
 To control robot using a keyboard
 ```
-rosrun d_hospital_navigation keyboard_nav.py
+rosrun d_hospital_navigation test_kb_control.py
 ```
 
 
