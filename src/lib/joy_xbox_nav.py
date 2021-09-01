@@ -18,7 +18,7 @@ from joystick_xbox import XboxController
 class JoyNav:
     def __init__(self, max_speed=0.5, max_rot=0.5, motor_topic="/cmd_vel", joy_topic="/joy", deadzone=0.05):
         """ Description:
-                create a new JoyNav object"""
+                creates a new JoyNav object"""
         """ Args:
                 max_speed(float): maximum speed robot will achieve
                 max_rot(float): maximum angular speed
@@ -83,7 +83,7 @@ class JoyNav:
         print "But first of all, please set the max speed and max rotation for the robot"
         pass
 
-    
+
 def main():
     js = JoyNav()
     js.initialize()
