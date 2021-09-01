@@ -31,12 +31,12 @@ class JoyNav:
         self.joystick = XboxController(joy_topic, deadzone)
         pass
 
-    def initialize(self):
+    def initialise(self):
         """ Description:
                 initialise odometry and controller """
         rospy.init_node("joystick_navigation")
         self.control.initialise()
-        self.joystick.initialize()
+        self.joystick.initialise()
         pass
 
     def set_max_vel(self):
@@ -86,7 +86,7 @@ class JoyNav:
 
 def main():
     js = JoyNav()
-    js.initialize()
+    js.initialise()
     js.print_info()
     js.set_max_vel()
     js.set_max_rot()
