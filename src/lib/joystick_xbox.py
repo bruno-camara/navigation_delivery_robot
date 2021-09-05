@@ -25,7 +25,7 @@ class XboxController:
                 motor_topic(string):topic name to motor control sensor
                 joy_topic(string): joystick topic
                 deadzonde(float): discarted zone for analogigs in controller """
-        self.deadzone = deadzone        
+        self.deadzone = deadzone
         self.joy_topic = joy_topic
         self.axis_left_y = 0.0
         self.axis_left_x = 0.0
@@ -49,7 +49,7 @@ class XboxController:
         self.joy_buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         pass
 
-    def initialize(self):
+    def initialise(self):
         """ Description:
                 initialise controller subscription """
         self.joy_subscriber = rospy.Subscriber(self.joy_topic, Joy, self._callback)
@@ -79,7 +79,7 @@ class XboxController:
         self.r_pause = data.buttons[7]
         self.button_l = data.buttons[9]
         self.button_r = data.buttons[10]
-        
+
         self.joy_axes = data.axes
         self.joy_buttons = data.buttons
         pass
@@ -119,12 +119,12 @@ class XboxController:
             buttons[0] = 1
         elif self.button_r_l > 0.1:
             buttons[1] = 1
-        
+
         if self.button_up_down > 0.1:
             buttons[2] = 1
         elif self.button_up_down < -0.1:
             buttons[3] = 1
-        
+
         return buttons
         pass
 
@@ -155,7 +155,3 @@ class XboxController:
         buttons = [self.button_l, self.button_r]
         return buttons
         pass
-
-
-    
-
