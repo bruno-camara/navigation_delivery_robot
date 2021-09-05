@@ -1,5 +1,14 @@
-#!/usr/bin/env python
+#/usr/bin/env python
 # coding=utf-8
+"""
+    File:
+        info_adapter.py
+    Author:
+        Vanderson Santos <vanderson.santos@usp.br>
+    Data:
+        09/2021
+"""
+
 import rospy
 from lib.motor import MotorControl
 from lib.serial_communication import SerialCommunication
@@ -23,13 +32,13 @@ def map(value,min,max,new_min,new_max):
 constrain = lambda val, min_val, max_val: min(max_val, max(min_val, val))
 communication = SerialCommunication(PORT)
 
-def robot_manual_controller(debug = False):
+def info_hardware_adapter(debug = False):
     #motor delcaration
-    rospy.init_node('robot_manual_controller', anonymous=True)
+    rospy.init_node('info_hardware_adapter', anonymous=True)
     rate = rospy.Rate(CONTROL_RATE)
 
     
-    motor_back=MotorControl("/cmd_vel")
+    motor_back = MotorControl("/cmd_vel")
     motor_back.initialise()
 
     #serial comunication
@@ -70,7 +79,7 @@ def robot_manual_controller(debug = False):
 if __name__ == "__main__":
     try:
 
-        robot_manual_controller(debug = True)
+        info_hardware_adapter(debug = True)
 
     except rospy.ROSInterruptException:
         communication.finalize()
