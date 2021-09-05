@@ -7,6 +7,8 @@
         serial_communication class
     Author:
         Vanderson Santos <vanderson.santos@usp.br>
+    note:
+        Information sender is slow, need be improve
     Data:
         08/2021
 """
