@@ -35,31 +35,46 @@ class KeyboardControler:
         self.control.initialise()
         pass
 
-    def set_max_vel(self):
+    def set_max_vel(self, new_speed = 1):
         """ Description:
-                asks and update max_vel """
+                updates max_vel """
+        """Parameters:
+                new_speed: new robot's max speed. Default is 1"""
         is_valid = False
         while not is_valid:
             try:
-                new_max_speed = float(input("Max linear speed: "))
+                new_max_speed = float(new_speed)
                 self.max_speed = new_max_speed
                 is_valid = True
             except:
-                print "Please, enter a valid value"
+                print "Error setting new speed"
         pass
 
-    def set_max_rot(self):
+    def get_max_vel(self):
         """ Description:
-                asks and update max_rot """
+                returns max_vel """
+        return self.max_speed
+        pass
+
+    def set_max_rot(self, max_rot = 1):
+        """ Description:
+                updates max_rot """
+        """Parameters:
+                new_rot: new robot's max rotation. Default is 1"""
         is_valid = False
         while not is_valid:
             try:
-                new_max_rot = float(input("Max angular speed: "))
+                new_max_rot = float(max_rot)
                 self.max_rot = new_max_rot
                 is_valid = True
             except:
-                print "Please enter a valid value"
+                print "Error setting new rotation"
 
+    def get_max_rot(self):
+        """ Description:
+                returns max_rot """
+        return self.max_rot
+        pass
 
 
     def set_vel(self, command):
@@ -129,4 +144,3 @@ class KeyboardControler:
         print "   w   "
         print "a  s  d \n\n"
         print "To kill the program, press and release the key 'P' on your keyboard \n\n"
-        print "But first of all, please set the max speed and max rotation for the robot"

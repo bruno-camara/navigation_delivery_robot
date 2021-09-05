@@ -39,17 +39,19 @@ class JoyNav:
         self.joystick.initialise()
         pass
 
-    def set_max_vel(self):
+    def set_max_vel(self, new_speed = 1):
         """ Description:
-                asks and update max_vel """
+                updates max_vel """
+        """ Args:
+                new_speed(float): new maximum speed. Deafault is 1"""
         is_valid = False
         while not is_valid:
             try:
-                new_max_speed = float(input("Max linear speed: "))
+                new_max_speed = float(new_speed)
                 self.max_speed = new_max_speed
                 is_valid = True
-            except:
-                print "Please, enter a valid value"
+            except ValueError:
+                print "Error setting max speed"
         pass
 
     def get_max_vel(self):
@@ -59,17 +61,19 @@ class JoyNav:
         pass
 
 
-    def set_max_rot(self):
+    def set_max_rot(self, new_rot = 1):
         """ Description:
                 asks and update max_rot """
+        """ Args:
+                new_rot(float): new maximum rotation. Deafault is 1"""
         is_valid = False
         while not is_valid:
             try:
-                new_max_rot = float(input("Max angular speed: "))
+                new_max_rot = float(new_rot)
                 self.max_rot = new_max_rot
                 is_valid = True
-            except:
-                print "Please enter a valid value"
+            except ValueError:
+                print "Error setting max rotation"
         pass
 
     def get_max_rot(self):
@@ -101,8 +105,8 @@ def main():
     js = JoyNav()
     js.initialise()
     js.print_info()
-    js.set_max_vel()
-    js.set_max_rot()
+    js.set_max_vel(input("Enter maximum speed "))
+    js.set_max_rot(input("Enter maximum rotation "))
     rate = rospy.Rate(60)
     while not rospy.is_shutdown():
         js.set_vel()
