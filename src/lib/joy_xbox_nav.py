@@ -52,6 +52,13 @@ class JoyNav:
                 print "Please, enter a valid value"
         pass
 
+    def get_max_vel(self):
+        """ Description:
+                returns max_vel """
+        return self.max_speed
+        pass
+
+
     def set_max_rot(self):
         """ Description:
                 asks and update max_rot """
@@ -63,6 +70,12 @@ class JoyNav:
                 is_valid = True
             except:
                 print "Please enter a valid value"
+        pass
+
+    def get_max_rot(self):
+        """ Description:
+                returns max_rot """
+        return self.max_rot
         pass
 
     def set_vel(self):
