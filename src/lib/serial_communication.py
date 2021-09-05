@@ -59,4 +59,4 @@ class SerialCommunication:
             Args: data(string) send data do hardware"""
         self.read_data()
         if self.usb_port.isOpen():
-                self.usb_port.write(data+'\r\n')
+            self.usb_port.write(data+'\r\n')

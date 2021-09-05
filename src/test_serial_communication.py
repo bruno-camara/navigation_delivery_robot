@@ -14,13 +14,12 @@
 import rospy
 from lib.serial_communication import SerialCommunication
 
-PORT = '/dev/ttyUSB0'
+PORT = "/dev/ttyUSB0"
 
 def main():
     communication = SerialCommunication(PORT)
     communication.initialise()
 
-    #flood of tests
     communication.send_data('10001')
     communication.send_data('11001')
     communication.send_data('10001')
@@ -31,8 +30,6 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-        pass
-    except rospy.ROSInterruptException:
         pass
     finally:
         pass

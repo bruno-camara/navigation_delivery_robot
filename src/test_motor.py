@@ -21,8 +21,8 @@ def main_read():
     print(motor_back)
 
     while not rospy.is_shutdown():
-        print("velocity",motor_back.get_velocity())
-        print("rotation",motor_back.get_rotation())
+        print("velocity",motor_back.get_velocity()._type)
+        print("rotation",motor_back.get_rotation()._type)
         rate.sleep()
         pass
 
@@ -43,7 +43,7 @@ pass
 
 if __name__ == "__main__":
     try:
-        main_set()
+        main_read()
         pass
     except rospy.ROSInterruptException:
         pass
