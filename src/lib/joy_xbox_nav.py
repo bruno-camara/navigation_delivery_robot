@@ -107,7 +107,7 @@ def main():
     js.print_info()
     js.set_max_vel(input("Enter maximum speed "))
     js.set_max_rot(input("Enter maximum rotation "))
-    rate = rospy.Rate(60)
+    rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         js.set_vel()
         js.set_rot()
