@@ -111,7 +111,7 @@ def main():
     while not rospy.is_shutdown():
         js.set_vel()
         js.set_rot()
-        rate.sleep
+        rate.sleep()
 
 if __name__ == '__main__':
     main()
