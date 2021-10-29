@@ -16,7 +16,7 @@ import numpy as np
 import math
 
 class LidarSensor:
-    def __init__(self, topic_name, n_regions = 720):
+    def __init__(self, topic_name, n_regions = 720, angle_offset = 0.0):
         """ Description:
                 create a new LIDAR Sensor object"""
         """ Args:
@@ -38,6 +38,8 @@ class LidarSensor:
         self.regions = [0.0] * n_regions
         self.number_of_reads = n_regions
         self.d_th = 360.0/self.number_of_reads
+
+        self.angle_offset = angle_offset
 
         pass
 
@@ -63,13 +65,35 @@ class LidarSensor:
 
         self.max_distance = data.range_max
         self.min_distance = data.range_min
+        #regions_temp = [0.0] * self.number_of_reads
         for i in range(0, min(self.number_of_reads, size(data.ranges)), 1):
             self.regions[i] = max(min(data.ranges[i], self.max_distance), self.min_distance)
 
-        self.normal_distance_left = min(self.regions[int(0.75*self.number_of_reads)-1:int(0.75 * self.number_of_reads)+1])
+        index_offset = int(self.angle_offset/self.number_of_reads)
+        if self.angle_offset < 0:
+            self.regions = self.regions[index_offset:] + self.regions[:index_offset]
+        elif self.angle_offset > 0:
+            self.regions = self.regions[:index_offset] + self.regions[index_offset:]
+
+
+        #if self.angle_offset > 0:
+        #    index_offset = (self.angle_offset/self.number_of_reads)
+        #    for i in range(index_offset, self.number_of_reads):
+        #        self.regions[i]=regions_temp[i-index_offset]
+        #    for i in range(0,index_offset):
+        #        self.regions[i] = regions_temp[(self.number_of_reads-index_offset)+i]
+        #elif self.angle_offset < 0:
+        #    index_offset = - (self.angle_offset/self.number_of_reads)
+        #    for i in range(index_offset, self.number_of_reads):
+        #        self.regions[i-index_offset] = regions_temp[i]
+        #    for i in range(0, index_offset):
+        #        self.regions[i+index_offset] = regions_temp[i]
+
+
+        self.normal_distance_left = min(self.regions[int(0.5*self.number_of_reads)-1:int(0.5 * self.number_of_reads)+1])
         self.normal_point_left = np.array([-self.normal_distance_left, 0.0])
 
-        self.normal_distance_right = min(self.regions[int(0.25*self.number_of_reads)-1:int(0.25 * self.number_of_reads)+1])
+        self.normal_distance_right = min(self.regions[self.number_of_reads-1], self.regions[1], self.regions[0])
         self.normal_point_right = np.array([self.normal_distance_right, 0.0])
 
 
@@ -94,10 +118,12 @@ class LidarSensor:
                 counter clockwise is positive """
         start_data = int(min_angle / self.d_th + (self.number_of_reads/2))
         stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))
+        print(min_angle, max_angle)
 
         print(start_data)
         print(stop_data)
-        #print(self.regions)
+        print(self.regions)
+
 
         self.closest_distance = min(min(self.regions[start_data : stop_data]), self.max_distance)
         return self.closest_distance
@@ -109,8 +135,8 @@ class LidarSensor:
         """ Args:
                 self, start angle, stop angle: given in degrees, 0 is in front of LIDAR,
                 counter clockwise is positive """
-        start_data = int(min_angle / self.d_th + (self.number_of_reads/2))
-        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))
+        start_data = int(min_angle / self.d_th + (self.number_of_reads/2)) #int(min_angle / self.d_th + (self.number_of_reads/2))
+        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2)) #int(max_angle / self.d_th + (self.number_of_reads/2))
         distance = self.get_closest_distance(min_angle, max_angle)
         self.closest_point = distance * np.array([np.cos(math.radians((self.regions.index(distance, start_data, stop_data)-180)/2)),
                              np.sin(math.radians((self.regions.index(distance, start_data, stop_data)-180)/2))])
@@ -148,8 +174,8 @@ class LidarSensor:
         """ Args:
                 self, start angle, stop angle: given in degrees, 0 is in front of LIDAR,
                 counter clockwise is positive """
-        start_data = int(min_angle / self.d_th + (self.number_of_reads/2))
-        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))
+        start_data = int(min_angle / self.d_th + (self.number_of_reads/2))#int(min_angle / self.d_th + (self.number_of_reads/2))
+        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))#int(max_angle / self.d_th + (self.number_of_reads/2))
         index = self.regions.index(min(self.regions[start_data : stop_data]), start_data, stop_data)
         angle = (index - 360) / 2
         return angle

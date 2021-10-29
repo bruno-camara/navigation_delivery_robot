@@ -33,7 +33,7 @@ state_dict_ = {
 front_vector_lidar = np.array([0.0, 0.0])
 back_vector_lidar = np.array([0.0, 0.0])
 # LIDAR Object. Comment first and uncomment second for simulation
-lidar = LidarSensor('d_hospital/laser/scan', 180)
+lidar = LidarSensor('d_hospital/laser/scan', 180, 90)
 #lidar = LidarSensor('d_hospital/laser/scan')
 
 
@@ -213,7 +213,7 @@ def take_action(): #works only if wall is already found
     min_angle  = 0.05
     distance_threshold = best_distance / 15.0
 
-    if not(is_in_window()): #follow using lidar
+    if 1: #not(is_in_window()): #follow using lidar
         angle  = -math.asin(wall_direction[1])
         print ("Using lidar")
         print (angle)
