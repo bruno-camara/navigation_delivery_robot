@@ -146,10 +146,10 @@ def find_next_corner():
     print (lidar.get_closest_distance(-22.5, 22.5))
 
 
-    if lidar.get_closest_distance(90, 93) > best_distance * 1.5 and lidar.get_closest_point_angle(22.5, 112.5) >= 90: #(min(regions[540:545]) > best_distance * 1.5) and regions.index(min(regions[405:585]), 405, 585) >= 540:
+    if lidar.get_closest_distance(90, 93) > best_distance * 1.5 and lidar.get_closest_point_angle(22.5, 112.5) >= 90:
         print ("need to turn left")
         next_turn_direction = 1
-    elif lidar.get_closest_distance(-22.5, 22.5) < 0.9 or lidar.get_closest_distance(-112.5, -23) <0.3:#(min(regions[315:404]) < 0.9 ) or (min(regions[135:314]) < 0.3): #best_distance * 1.5
+    elif lidar.get_closest_distance(-22.5, 22.5) < 0.9 or lidar.get_closest_distance(-112.5, -23) <0.3:
         print ("need to turn right")
 
         next_turn_direction = 2

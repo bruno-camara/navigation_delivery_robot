@@ -93,7 +93,11 @@ class LidarSensor:
                 self, start angle, stop angle: given in degrees, 0 is in front of LIDAR,
                 counter clockwise is positive """
         start_data = int(min_angle / self.d_th + (self.number_of_reads/2))
-        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))-1
+        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))
+
+        print(start_data)
+        print(stop_data)
+        #print(self.regions)
 
         self.closest_distance = min(min(self.regions[start_data : stop_data]), self.max_distance)
         return self.closest_distance
@@ -106,7 +110,7 @@ class LidarSensor:
                 self, start angle, stop angle: given in degrees, 0 is in front of LIDAR,
                 counter clockwise is positive """
         start_data = int(min_angle / self.d_th + (self.number_of_reads/2))
-        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))-1
+        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))
         distance = self.get_closest_distance(min_angle, max_angle)
         self.closest_point = distance * np.array([np.cos(math.radians((self.regions.index(distance, start_data, stop_data)-180)/2)),
                              np.sin(math.radians((self.regions.index(distance, start_data, stop_data)-180)/2))])
@@ -145,7 +149,7 @@ class LidarSensor:
                 self, start angle, stop angle: given in degrees, 0 is in front of LIDAR,
                 counter clockwise is positive """
         start_data = int(min_angle / self.d_th + (self.number_of_reads/2))
-        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2)) -1
+        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))
         index = self.regions.index(min(self.regions[start_data : stop_data]), start_data, stop_data)
         angle = (index - 360) / 2
         return angle
