@@ -9,18 +9,18 @@
         Pedro Croso <pedrocroso@usp.br>
 """
 
+from numpy.core.fromnumeric import size
 import rospy
 from sensor_msgs.msg import LaserScan
 import numpy as np
 import math
 
 class LidarSensor:
-    def __init__(self, topic_name):
+    def __init__(self, topic_name, n_regions = 720):
         """ Description:
                 create a new LIDAR Sensor object"""
         """ Args:
                 topic_name(string):topic name to lidar sensor """
-        self.regions = [0.0] * 720
 
         self.closest_distance = 0.0
         self.closest_point = np.array([0.0, 0.0])
@@ -34,6 +34,11 @@ class LidarSensor:
 
         self.max_distance = 0.0
         self.min_distance = 0.0
+
+        self.regions = [0.0] * n_regions
+        self.number_of_reads = n_regions
+        self.d_th = 360.0/self.number_of_reads
+
         pass
 
     def __str__(self):
@@ -54,16 +59,18 @@ class LidarSensor:
                 callback to update values """
         """ Args:
                 data(sensor_msgs.msg.LaserScan):lidar sensor data """
+
+
         self.max_distance = data.range_max
         self.min_distance = data.range_min
-        for i in range(0, 720, 1):
+        for i in range(0, min(self.number_of_reads, size(data.ranges)), 1):
             self.regions[i] = max(min(data.ranges[i], self.max_distance), self.min_distance)
 
-        self.normal_distance_left = min(self.regions[538:542])
-        self.normal_point_left = np.array([-min(self.regions[538:542]), 0.0])
+        self.normal_distance_left = min(self.regions[int(0.75*self.number_of_reads)-1:int(0.75 * self.number_of_reads)+1])
+        self.normal_point_left = np.array([-self.normal_distance_left, 0.0])
 
-        self.normal_distance_right = min(self.regions[178:182])
-        self.normal_point_right = np.array([min(self.regions[178:182]), 0.0])
+        self.normal_distance_right = min(self.regions[int(0.25*self.number_of_reads)-1:int(0.25 * self.number_of_reads)+1])
+        self.normal_point_right = np.array([self.normal_distance_right, 0.0])
 
 
     def get_regions(self):
@@ -85,8 +92,9 @@ class LidarSensor:
         """ Args:
                 self, start angle, stop angle: given in degrees, 0 is in front of LIDAR,
                 counter clockwise is positive """
-        start_data = int(360 + 2 * min_angle)
-        stop_data = int(360 + 2 * max_angle)
+        start_data = int(min_angle / self.d_th + (self.number_of_reads/2))
+        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))-1
+
         self.closest_distance = min(min(self.regions[start_data : stop_data]), self.max_distance)
         return self.closest_distance
         pass
@@ -97,8 +105,8 @@ class LidarSensor:
         """ Args:
                 self, start angle, stop angle: given in degrees, 0 is in front of LIDAR,
                 counter clockwise is positive """
-        start_data = int(360 + 2 * min_angle)
-        stop_data = int(360 + 2 * max_angle)
+        start_data = int(min_angle / self.d_th + (self.number_of_reads/2))
+        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2))-1
         distance = self.get_closest_distance(min_angle, max_angle)
         self.closest_point = distance * np.array([np.cos(math.radians((self.regions.index(distance, start_data, stop_data)-180)/2)),
                              np.sin(math.radians((self.regions.index(distance, start_data, stop_data)-180)/2))])
@@ -136,8 +144,8 @@ class LidarSensor:
         """ Args:
                 self, start angle, stop angle: given in degrees, 0 is in front of LIDAR,
                 counter clockwise is positive """
-        start_data = int(360 + 2 * min_angle)
-        stop_data = int(360 + 2 * max_angle)
+        start_data = int(min_angle / self.d_th + (self.number_of_reads/2))
+        stop_data = int(max_angle / self.d_th + (self.number_of_reads/2)) -1
         index = self.regions.index(min(self.regions[start_data : stop_data]), start_data, stop_data)
         angle = (index - 360) / 2
         return angle

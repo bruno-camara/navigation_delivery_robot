@@ -30,9 +30,11 @@ state_dict_ = {
 }
 
 #LIDAR eh origem do sistema
-lidar = LidarSensor('d_hospital/laser/scan')
 front_vector_lidar = np.array([0.0, 0.0])
 back_vector_lidar = np.array([0.0, 0.0])
+# LIDAR Object. Comment first and uncomment second for simulation
+lidar = LidarSensor('d_hospital/laser/scan', 180)
+#lidar = LidarSensor('d_hospital/laser/scan')
 
 
 #vetor da origem a parede na frente pelo sensor de proximidade
@@ -50,11 +52,13 @@ wall_direction = np.array([0.0, 0.0])
 wall_direction_prox = np.array([0.0, 0.0])
 
 #distance robot will keep from wall
-best_distance = 0.5
+best_distance = 0.8
 closest_point = 0.0
 
+#Uncomment 720 for simulation
+regions = [0.0] * 180
+#regions = [0.0] * 720
 
-regions = [0.0] * 720
 
 next_turn_direction = 0
 
@@ -135,25 +139,25 @@ def find_next_corner():
     }
     next_turn_direction = 0
 
-    try:
-        distance_threshold = best_distance / 8.0
-        medium_distance = np.linalg.norm(closest_point)
-        distance_error = medium_distance - best_distance
-        print (lidar.get_closest_distance(-22.5, 22.5))
+    #try:
+    distance_threshold = best_distance / 8.0
+    medium_distance = np.linalg.norm(lidar.get_closest_point(-180, 180))
+    distance_error = medium_distance - best_distance
+    print (lidar.get_closest_distance(-22.5, 22.5))
 
 
-        if lidar.get_closest_distance(90, 93) > best_distance * 1.5 and lidar.get_closest_point_angle(22.5, 112.5) >= 90: #(min(regions[540:545]) > best_distance * 1.5) and regions.index(min(regions[405:585]), 405, 585) >= 540:
-            print ("need to turn left")
-            next_turn_direction = 1
-        elif lidar.get_closest_distance(-22.5, 22.5) < 0.9 or lidar.get_closest_distance(-112.5, -23) <0.3:#(min(regions[315:404]) < 0.9 ) or (min(regions[135:314]) < 0.3): #best_distance * 1.5
-            print ("need to turn right")
+    if lidar.get_closest_distance(90, 93) > best_distance * 1.5 and lidar.get_closest_point_angle(22.5, 112.5) >= 90: #(min(regions[540:545]) > best_distance * 1.5) and regions.index(min(regions[405:585]), 405, 585) >= 540:
+        print ("need to turn left")
+        next_turn_direction = 1
+    elif lidar.get_closest_distance(-22.5, 22.5) < 0.9 or lidar.get_closest_distance(-112.5, -23) <0.3:#(min(regions[315:404]) < 0.9 ) or (min(regions[135:314]) < 0.3): #best_distance * 1.5
+        print ("need to turn right")
 
-            next_turn_direction = 2
-        else:
-            next_turn_direction = 0
-    except ValueError as error:
-        print ("A value error ocoured")
-        print (error)
+        next_turn_direction = 2
+    else:
+        next_turn_direction = 0
+    #except ValueError as error:
+    #    print ("A value error ocoured")
+    #    print (error)
 
 
 
