@@ -43,13 +43,15 @@ def main():
     while not rospy.is_shutdown():
 
         #rospy.spin()
-        br.sendTransform((0.0, 0.0, 0.0),
+
+        #Criar parametrizacao para posicao inicial no mapa
+        br.sendTransform((0.0, 0.0, 1.0),
                         (0.0, 0.0, 0.0, 1.0),
                         rospy.Time.now(),
                         "odom",
                         "map")
 
-        br1.sendTransform((0.0, 0.0, 0.0),
+        br1.sendTransform((0.0, 0.0, 0.7),
                         (0.0, 0.0, 0.0, 1.0),
                         rospy.Time.now(),
                         "laser",
