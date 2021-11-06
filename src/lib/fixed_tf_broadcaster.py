@@ -4,6 +4,7 @@ import roslib
 
 import rospy
 import tf
+from tf.transformations import quaternion_from_euler
 import math
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
@@ -22,6 +23,13 @@ def main():
     br = tf.TransformBroadcaster()
     br1 = tf.TransformBroadcaster()
     br2 = tf.TransformBroadcaster()
+
+    br_sens_b = tf.TransformBroadcaster()
+    br_sens_br = tf.TransformBroadcaster()
+    br_sens_bl = tf.TransformBroadcaster()
+    br_sens_f = tf.TransformBroadcaster()
+    br_sens_fr = tf.TransformBroadcaster()
+    br_sens_fl = tf.TransformBroadcaster()
 
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=1)
 
@@ -50,11 +58,52 @@ def main():
                         rospy.Time.now(),
                         "odom",
                         "map")
-
+        # Localizar partes do robo em relacao a base
         br1.sendTransform((0.0, 0.0, 0.7),
                         (0.0, 0.0, 0.0, 1.0),
                         rospy.Time.now(),
                         "laser",
+                        "base")
+        rotation = quaternion_from_euler(0, 0, math.pi)
+        br_sens_b.sendTransform((-0.38, 0.0, -0.46),
+                        rotation,
+                        rospy.Time.now(),
+                        "distance_sensor_back",
+                        "base")
+
+        rotation = quaternion_from_euler(0, 0, -math.pi/2)
+        br_sens_br.sendTransform((-0.22, -0.25, -0.46),
+                        rotation,
+                        rospy.Time.now(),
+                        "distance_sensor_back_right",
+                        "base")
+
+        rotation = quaternion_from_euler(0, 0, math.pi/2)
+        br_sens_bl.sendTransform((-0.22, 0.25, -0.46),
+                        rotation,
+                        rospy.Time.now(),
+                        "distance_sensor_back_left",
+                        "base")
+
+        rotation = quaternion_from_euler(0, 0, 0)
+        br_sens_f.sendTransform((0.38, 0.0, -0.46),
+                        rotation,
+                        rospy.Time.now(),
+                        "distance_sensor_front",
+                        "base")
+
+        rotation = quaternion_from_euler(0, 0, -math.pi/2)
+        br_sens_fr.sendTransform((0.22, -0.25, -0.46),
+                        rotation,
+                        rospy.Time.now(),
+                        "distance_sensor_front_right",
+                        "base")
+
+        rotation = quaternion_from_euler(0, 0, math.pi/2)
+        br_sens_fl.sendTransform((0.22, 0.25, -0.46),
+                        rotation,
+                        rospy.Time.now(),
+                        "distance_sensor_front_left",
                         "base")
 
 

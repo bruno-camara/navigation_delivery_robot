@@ -10,17 +10,24 @@
 """
 
 import rospy
+import math
 from sensor_msgs.msg import Range
 
 class DistanceSensor:
-    def __init__(self, topic_name):
+    def __init__(self, topic_name, angle_py=[0.0, 0.0], position=[0.0,0.0,0.0]):
         """ Description:
                 create a new Distance Sensor object"""
         """ Args:
-                topic_name(string):topic name to distance sensor """
+                topic_name(string):topic name to distance sensor
+                angle_py(list): direction at which sensor is facing
+                    angle_py[0]: vertical angle
+                    angle_py[1]: horisontal angle
+                position(list): relative position to origin(x,y,z) """
         self.distance = 0
         self.max_distance = 0
         self.min_distance = 0
+        self.position = list(position[:])
+        self.angle = list(angle_py[:])
         self.topic_name = topic_name
         pass
 
@@ -65,5 +72,15 @@ class DistanceSensor:
         return self.min_distance
         pass
 
+    def get_point_detected(self):
+        """ Description:
+                return array of point detected based on angle and position """
+        point = list(self.position)
+        point[0] = point[0] + self.get_distance() * math.cos(math.radians(self.angle[1])) * math.cos(math.radians(self.angle[0]))
+        point[1] = point[1] + self.get_distance() * math.sin(math.radians(self.angle[1])) * math.cos(math.radians(self.angle[0]))
+        point[2] = point[2] + self.get_distance() * math.sin(math.radians(self.angle[0]))
+        return point
+        pass
+
+
     pass
-    
