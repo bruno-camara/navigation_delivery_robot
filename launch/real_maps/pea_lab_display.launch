@@ -8,7 +8,7 @@
     default="True" />
 
     <!-- add simulation robot model -->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find d_hospital_gazebo)/urdf/d_hospital.xacro'" />
+  <!--param name="robot_description" command="$(find xacro)/xacro.py '$(find d_hospital_gazebo)/urdf/d_hospital.xacro'" /-->
 
     <!-- send fake joint values -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
