@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg
+    name="model" />
+  <arg
+    name="gui"
+    default="True" />
+
+    <!-- add simulation robot model -->
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find d_hospital_gazebo)/urdf/d_hospital.xacro'" />
+
+    <!-- send fake joint values -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+      <param name="use_gui" value="False"/>
+    </node>
+
+    <!-- Combine joint values -->
+  <node
+    name="robot_state_publisher"
+    pkg="robot_state_publisher"
+    type="state_publisher" />
+
+  <!-- Show in Rviz   -->
+  <node
+    name="rviz"
+    pkg="rviz"
+    type="rviz"
+    args="-d $(find d_hospital_navigation)/rviz/real_maps/pea_lab.rviz" />
+</launch>
