@@ -47,7 +47,7 @@ class KeyboardControler:
                 self.max_speed = new_max_speed
                 is_valid = True
             except:
-                print "Error setting new speed"
+                print("Error setting new speed")
         pass
 
     def get_max_vel(self):
@@ -68,7 +68,7 @@ class KeyboardControler:
                 self.max_rot = new_max_rot
                 is_valid = True
             except:
-                print "Error setting new rotation"
+                print("Error setting new rotation")
 
     def get_max_rot(self):
         """ Description:

@@ -20,7 +20,9 @@ class LidarSensor:
         """ Description:
                 create a new LIDAR Sensor object"""
         """ Args:
-                topic_name(string):topic name to lidar sensor """
+                topic_name(string):topic name to lidar sensor
+                n_regions: number of rays per revolutions
+                angle offset: angle of lidar in reference to its system """
 
         self.closest_distance = 0.0
         self.closest_point = np.array([0.0, 0.0])
@@ -71,12 +73,17 @@ class LidarSensor:
         for i in range(0, min(self.number_of_reads, size(data.ranges)), 1):
             self.regions[i] = max(min(data.ranges[i], self.max_distance), self.min_distance)
 
+<<<<<<< HEAD
         index_offset = int(self.angle_offset*self.number_of_reads/360)
 	print("Offset: ")
 	print(index_offset)
         if self.angle_offset < 0:
+=======
+        index_offset = int(360*self.angle_offset/self.number_of_reads)
+        if self.angle_offset < 0.0:
+>>>>>>> 17b4d6a48eed34888fbe921496f871ba8842ed0c
             self.regions = self.regions[index_offset:] + self.regions[:index_offset]
-        elif self.angle_offset > 0:
+        elif self.angle_offset > 0.0:
             self.regions = self.regions[:index_offset] + self.regions[index_offset:]
 
 
