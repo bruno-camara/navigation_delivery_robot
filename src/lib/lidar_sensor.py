@@ -67,12 +67,21 @@ class LidarSensor:
 
         self.max_distance = data.range_max
         self.min_distance = data.range_min
+	#print ("Size of lidar msg")
+	#print(size(data.ranges))
         #regions_temp = [0.0] * self.number_of_reads
         for i in range(0, min(self.number_of_reads, size(data.ranges)), 1):
             self.regions[i] = max(min(data.ranges[i], self.max_distance), self.min_distance)
 
+<<<<<<< HEAD
+        index_offset = int(self.angle_offset*self.number_of_reads/360)
+	print("Offset: ")
+	print(index_offset)
+        if self.angle_offset < 0:
+=======
         index_offset = int(360*self.angle_offset/self.number_of_reads)
         if self.angle_offset < 0.0:
+>>>>>>> 17b4d6a48eed34888fbe921496f871ba8842ed0c
             self.regions = self.regions[index_offset:] + self.regions[:index_offset]
         elif self.angle_offset > 0.0:
             self.regions = self.regions[:index_offset] + self.regions[index_offset:]

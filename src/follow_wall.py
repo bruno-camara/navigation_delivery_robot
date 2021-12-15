@@ -33,7 +33,7 @@ state_dict_ = {
 front_vector_lidar = np.array([0.0, 0.0])
 back_vector_lidar = np.array([0.0, 0.0])
 # LIDAR Object. Comment first and uncomment second for simulation
-lidar = LidarSensor('d_hospital/laser/scan', 180, 90)
+lidar = LidarSensor('d_hospital/laser/scan', 360, 0)
 #lidar = LidarSensor('d_hospital/laser/scan')
 
 
@@ -52,11 +52,11 @@ wall_direction = np.array([0.0, 0.0])
 wall_direction_prox = np.array([0.0, 0.0])
 
 #distance robot will keep from wall
-best_distance = 0.8
+best_distance = 0.45
 closest_point = 0.0
 
 #Uncomment 720 for simulation
-regions = [0.0] * 180
+regions = [0.0] * 360
 #regions = [0.0] * 720
 
 
@@ -143,6 +143,7 @@ def find_next_corner():
     distance_threshold = best_distance / 8.0
     medium_distance = np.linalg.norm(lidar.get_closest_point(-180, 180))
     distance_error = medium_distance - best_distance
+    print("LIDAR closest distance: ")
     print (lidar.get_closest_distance(-22.5, 22.5))
 
 
@@ -216,9 +217,11 @@ def take_action(): #works only if wall is already found
     if 1: #not(is_in_window()): #follow using lidar
         angle  = -math.asin(wall_direction[1])
         print ("Using lidar")
+    	print("Angle: ")
         print (angle)
         medium_distance = lidar.get_closest_distance(67, 112.5)#np.linalg.norm(closest_point)
-        print (medium_distance)
+	#print("Medium distance: ")
+        #print (medium_distance)
     else:                   #follow using proximity
         angle  = -math.asin(wall_direction_prox[0])
         print ("Using prox")
@@ -233,7 +236,7 @@ def take_action(): #works only if wall is already found
 
     if ((distance_error < -distance_threshold) and (angle < -min_angle)):
         state_description = "Way too close to wall"
-        change_state(2)
+        change_state(5)
     elif ((distance_error < -distance_threshold) and ((angle < 0) & (angle > -min_angle))):
         state_description = "getting too close to wall"
         change_state(5)
@@ -268,57 +271,57 @@ def take_action(): #works only if wall is already found
 
 def find_wall():
     msg = Twist()
-    msg.linear.x = 0.2 * 1
-    msg.angular.z = 0.3 * 1
+    msg.linear.x = 0.2 * 4
+    msg.angular.z = 0.3 * 1.5
     return msg
 
 
 def turn_right():
     msg = Twist()
-    msg.linear.x = 0.02 * 1
-    msg.angular.z = -0.2 * 1
+    msg.linear.x = 0.02 * 4
+    msg.angular.z = -0.2 * 2
     return msg
 
 
 def turn_left():
     msg = Twist()
-    msg.linear.x = 0.04 * 1
-    msg.angular.z = 0.25 * 1
+    msg.linear.x = 0.04 * 4
+    msg.angular.z = 0.25 * 1.5
     return msg
 
 
 def adjust_left():
     msg = Twist()
-    msg.linear.x = 0.15 * 1
+    msg.linear.x = 0.15 * 4
     msg.angular.z = 0.2 * 1
     return msg
 
 
 def adjust_left_soft():
     msg = Twist()
-    msg.linear.x = 0.15 * 1
-    msg.angular.z = 0.2 * 1
+    msg.linear.x = 0.15 * 4
+    msg.angular.z = 0.2 * 1.5
     return msg
 
 
 def adjust_right():
     msg = Twist()
-    msg.linear.x = 0.2 * 1
-    msg.angular.z = -0.1 * 1
+    msg.linear.x = 0.2 * 4
+    msg.angular.z = -0.1 * 1.5
     return msg
 
 
 def adjust_right_soft():
     msg = Twist()
-    msg.linear.x = 0.2 * 1
+    msg.linear.x = 0.2 * 4
     msg.angular.z = -0.05 * 1
     return msg
 
 
 def go_straight():
     msg = Twist()
-    msg.linear.x = 0.2 * 1
-    msg.angular.x = 0.0 * 1
+    msg.linear.x = 0.2 * 4
+    msg.angular.x = 0.0 * 1.5
     return msg
 
 
