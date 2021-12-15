@@ -1,4 +1,13 @@
 <launch>
+  <!-- TF publisher-->
+  <node pkg="d_hospital_navigation" name="TF_publisher" type="fixed_tf_broadcaster.py" output="screen"/>
+
+  <!-- Data converter for prox sensors-->
+  <node pkg="d_hospital_navigation" name="Prox2PointCloud" type="prox_2_pointcloud_six.py" output="screen"/>
+
+  <!-- Launch LIDAR-->
+   <include file="$(find d_hospital_navigation)/launch/zima_lidar.launch"/>
+
   <!-- Arguments -->
   <arg name="map_file" default="$(find d_hospital_navigation)/maps/real_maps/pea_lab.yaml"/>
 
