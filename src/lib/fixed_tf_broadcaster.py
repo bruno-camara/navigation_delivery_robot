@@ -48,16 +48,19 @@ def main():
     last_time = rospy.Time.now()
 
     rate = rospy.Rate(10.0)
+    init = False
     while not rospy.is_shutdown():
 
         #rospy.spin()
 
         #Criar parametrizacao para posicao inicial no mapa
-        br.sendTransform((0.0, 0.0, 1.0),
-                        (0.0, 0.0, 0.0, 1.0),
-                        rospy.Time.now(),
-                        "odom",
-                        "map")
+        if not init:
+            br.sendTransform((0.0, 0.0, 1.0),
+                            (0.0, 0.0, 0.0, 1.0),
+                            rospy.Time.now(),
+                            "odom",
+                            "map")
+            init = True
         # Localizar partes do robo em relacao a base
         br1.sendTransform((0.0, 0.0, 0.7),
                         (0.0, 0.0, 0.0, 1.0),
