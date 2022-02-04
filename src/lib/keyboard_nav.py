@@ -13,6 +13,7 @@
 from motor import MotorControl
 import rospy
 from pynput import keyboard
+import time
 
 class KeyboardControler:
     def __init__(self, max_speed=0.5, max_rot=0.5, topic="/cmd_vel"):
@@ -25,6 +26,9 @@ class KeyboardControler:
         self.max_speed = max_speed
         self.max_rot = max_rot
         self.topic = topic
+        self.current_vel = 0
+        self.current_rot = 0
+        self.stop = False
         self.control = MotorControl(topic)
         pass
 
@@ -81,8 +85,10 @@ class KeyboardControler:
         """ Description:
                 updates robot speed acording to keyboard data """
         if command == 'w':
+            self.current_vel = self.max_speed
             self.control.set_velocity(self.max_speed)
         elif command == 's':
+            self.current_vel = -self.max_speed
             self.control.set_velocity(-self.max_speed)
         pass
 
@@ -90,8 +96,10 @@ class KeyboardControler:
         """ Description:
                 updates robot angular speed acording to keyboard data """
         if command == 'a':
+            self.current_rot = self.max_rot
             self.control.set_rotation(self.max_rot)
         elif command == 'd':
+            self.current_rot =  -self.max_rot
             self.control.set_rotation(-self.max_rot)
         pass
 
@@ -114,33 +122,50 @@ class KeyboardControler:
         def releasing(key):
             try:
                 released = key.char
-                print released
+                print (released)
             except:
                 return True
-            print "Rotation: "
-            print self.control.get_rotation()
-            print "Velocity: "
-            print self.control.get_velocity()
+            print ("Rotation: ")
+            print (self.control.get_rotation())
+            print ("Velocity: ")
+            print (self.control.get_velocity())
             if (self.control.get_velocity().x > 0.0) and (released == 'w'):
+                self.current_vel = 0.0
                 self.control.set_velocity(0.0)
             elif (self.control.get_velocity().x < 0.0) and (released == 's'):
+                self.current_vel = 0.0
                 self.control.set_velocity(0.0)
             if (self.control.get_rotation().z > 0.0) and (released == 'a'):
+                self.current_rot = 0.0
                 self.control.set_rotation(0.0)
             elif(self.control.get_rotation().z < 0.0) and (released == 'd'):
+                self.current_rot = 0.0
                 self.control.set_rotation(0.0)
             if released == 'p':
+                self.stop = True
                 return False
 
-        with keyboard.Listener(on_press=pressing, on_release=releasing) as lis:
-            lis.join()
+
+        #with keyboard.Listener(on_press=pressing, on_release=releasing) as lis:
+        #    lis.join()
+        lis = keyboard.Listener(on_press = pressing, on_release = releasing)
+        lis.start()
+
+        while not self.stop:
+            self.control.set_velocity(self.current_vel)
+            self.control.set_rotation(self.current_rot)
+            time.sleep(1.0/1000)
+
+        print("Here")
+
+
         pass
 
     def print_info(self):
         """ Description:
                 print some usefull info in screen """
-        print "Welcome to the DelHospital controller!"
-        print "To navigate you can use the keys"
-        print "   w   "
-        print "a  s  d \n\n"
-        print "To kill the program, press and release the key 'P' on your keyboard \n\n"
+        print ("Welcome to the DelHospital controller!")
+        print ("To navigate you can use the keys")
+        print ("   w   ")
+        print ("a  s  d \n\n")
+        print ("To kill the program, press and release the key 'P' on your keyboard \n\n")
