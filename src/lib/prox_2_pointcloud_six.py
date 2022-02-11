@@ -102,30 +102,57 @@ def main():
         front_right_point = front_r.get_point_detected()
         front_left_point = front_l.get_point_detected()
         cloud_points = []
-        right_points = []
-        left_points = []
-        front_points = []
-        back_points = []
+
+        # Verify OUT OF RANGE
+
+        in_range_back = True
+        in_range_back_left = True
+        in_range_back_right = True
+        in_range_front = True
+        in_range_front_left = True
+        in_range_front_right = True
+
+
+
+        if(back.get_distance() < 0):
+            in_range_back = False
+
+        if(back_l.get_distance() < 0):
+            in_range_back_left = False
+
+        if(back_r.get_distance() < 0):
+            in_range_back_right = False
+
+        if(front.get_distance() < 0):
+            in_range_front = False
+
+        if(front_l.get_distance() < 0):
+            in_range_front_left = False
+
+        if(front_r.get_distance() < 0):
+            in_range_front_right = False
+
+
 
         try:
             # Connect left points
 
-            if (back_l.get_distance() < lateral_th) and (front_l.get_distance() < lateral_th):
+            if (back_l.get_distance() < lateral_th) and (front_l.get_distance() < lateral_th) and (in_range_back_left and in_range_front_left):
                 cloud_points += conect_points(back_left_point, front_left_point, 20)
 
             #  Connect right points
-            if (front_r.get_distance() < lateral_th) and (back_r.get_distance() < lateral_th):
+            if (front_r.get_distance() < lateral_th) and (back_r.get_distance() < lateral_th) and (in_range_back_right and in_range_front_right):
                 cloud_points += conect_points(front_right_point, back_right_point, 20)
 
             #connect front to lateral
-            if (front_r.get_distance() < lateral_th/2) and front.get_distance() < 0.5:
+            if (front_r.get_distance() < lateral_th/2) and (front.get_distance() < 0.5) and (in_range_front and in_range_front_right):
                 cloud_points += conect_points(front_right_point, front_point, 20)
 
-            if (front_l.get_distance() < lateral_th/2) and front.get_distance() < 0.5:
+            if (front_l.get_distance() < lateral_th/2) and (front.get_distance() < 0.5) and (in_range_front and in_range_front_left):
                 cloud_points += conect_points(front_left_point, front_point, 20)
 
             # Connect front points
-            if front.get_distance() < 1.8:
+            if (front.get_distance() < 1.8) and (in_range_front):
                 p1 = list(front_point)
                 p2 = list(front_point)
                 p1[1] = p1[1] - 0.05
@@ -139,14 +166,14 @@ def main():
             #    cloud_points += conect_points(front_front_l_point, front_point, 20)
 
             #connect back to lateral
-            if (back_r.get_distance() < lateral_th/2) and back.get_distance() < 0.5:
+            if (back_r.get_distance() < lateral_th/2) and (back.get_distance() < 0.5) and (in_range_back_right and in_range_back):
                 cloud_points += conect_points(back_right_point, back_point, 20)
 
-            if (back_l.get_distance() < lateral_th/2) and back.get_distance() < 0.5:
+            if (back_l.get_distance() < lateral_th/2) and (back.get_distance() < 0.5) and (in_range_back_left and in_range_back):
                 cloud_points += conect_points(back_left_point, back_point, 20)
 
             # Connect back points
-            if back.get_distance() < 1.8:
+            if (back.get_distance() < 1.8) and (in_range_back):
                 p1 = list(back_point)
                 p2 = list(back_point)
                 p1[1] = p1[1] - 0.05
@@ -161,22 +188,22 @@ def main():
             # Add single points
 
 
-            if (back_l.get_distance() < lateral_th)  and (front_l.get_distance() >= lateral_th):
+            if (back_l.get_distance() < lateral_th)  and (front_l.get_distance() >= lateral_th) and (in_range_back_left):
                 cloud_points.append(back_left_point)
 
-            if (front_l.get_distance() < lateral_th) and (back_l.get_distance() >= lateral_th):
+            if (front_l.get_distance() < lateral_th) and (back_l.get_distance() >= lateral_th) and (in_range_front_left):
                 cloud_points.append(front_left_point)
 
-            if (front.get_distance() < 1.8):
+            if (front.get_distance() < 1.8) and (in_range_front):
                 cloud_points.append(front_point)
 
-            if (front_r.get_distance() < lateral_th) and (back_r.get_distance >= lateral_th):
+            if (front_r.get_distance() < lateral_th) and (back_r.get_distance >= lateral_th) and (in_range_front_right):
                 cloud_points.append(front_right_point)
 
-            if (back_r.get_distance < lateral_th) and (front_r.get_distance() >= lateral_th) :
+            if (back_r.get_distance < lateral_th) and (front_r.get_distance() >= lateral_th) and (in_range_back_right):
                 cloud_points.append(back_left_point)
 
-            if (back.get_distance() < 1.8):
+            if (back.get_distance() < 1.8) and (in_range_back):
                 cloud_points.append(back_point)
 
             cloud_points = add_height(1.5, cloud_points)
