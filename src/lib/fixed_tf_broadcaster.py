@@ -35,7 +35,7 @@ def main():
 
 
     ## Como n tem dado de odometria, sera usado o comando no lugar
-    rospy.Subscriber("/cmd_vel", Twist, _callback)
+    rospy.Subscriber("/current_vel", Twist, _callback)
 
     x = 0.0
     y = 0.0
