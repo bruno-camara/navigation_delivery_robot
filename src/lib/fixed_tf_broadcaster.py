@@ -7,7 +7,7 @@ import tf
 from tf.transformations import quaternion_from_euler
 import math
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
+from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TwistStamped
 
 
 
@@ -35,7 +35,7 @@ def main():
 
 
     ## Como n tem dado de odometria, sera usado o comando no lugar
-    rospy.Subscriber("/current_vel", Twist, _callback)
+    rospy.Subscriber("/current_vel", TwistStamped, _callback)
 
     x = 0.0
     y = 0.0
@@ -159,6 +159,8 @@ def _callback(data):
     global velocity_msg, rot_msg
     velocity_msg = data.linear.x
     rot_msg = data.angular.z
+    print(velocity_msg)
+    print(rot_msg)
     return
 
 
