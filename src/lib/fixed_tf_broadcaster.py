@@ -65,7 +65,7 @@ def main():
         br1.sendTransform((0.0, 0.0, 0.7),
                         (0.0, 0.0, 0.0, 1.0),
                         rospy.Time.now(),
-                        "laser",
+                        "link_lidar",
                         "base")
         rotation = quaternion_from_euler(0, 0, math.pi)
         br_sens_b.sendTransform((-0.38, 0.0, -0.46),

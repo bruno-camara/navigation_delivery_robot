@@ -7,12 +7,12 @@ footprint_padding: 0.1
 inflation_radius: 0.3
 cost_scaling_factor: 0.7
 
-map_type: costmap
+# map_type: costmap
 observation_sources: laser_scan_sensor #point_cloud_sensor
 
 # marking - add obstacle information to cost map
 # clearing - clear obstacle information to cost map
-laser_scan_sensor: {sensor_frame: laser, #link_lidar,
+laser_scan_sensor: {sensor_frame: link_lidar,
                     data_type: LaserScan,
                     topic: /d_hospital/laser/scan,
                     marking: true,
