@@ -157,8 +157,8 @@ def main():
 
 def _callback(data):
     global velocity_msg, rot_msg
-    velocity_msg = data.linear.x
-    rot_msg = data.angular.z
+    velocity_msg = data.twist.linear.x
+    rot_msg = data.twist.angular.z
     print(velocity_msg)
     print(rot_msg)
     return
