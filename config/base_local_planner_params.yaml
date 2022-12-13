@@ -3,8 +3,8 @@ controller_frequency: 1
 TrajectoryPlannerROS:
   max_vel_x: 0.7
   min_vel_x: 0.05
-  max_vel_theta: 0.2
-  min_vel_theta: -0.2
+  max_vel_theta: 0.7
+  min_vel_theta: -0.7
   min_in_place_vel_theta: 0.33
 
   acc_lim_theta: 0.5
