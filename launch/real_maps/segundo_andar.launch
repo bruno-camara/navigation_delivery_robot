@@ -15,10 +15,10 @@
    <include file="$(find d_hospital_navigation)/launch/zima_lidar.launch"/>
 
   <!-- Arguments -->
-  <arg name="map_file" default="$(find d_hospital_navigation)/maps/real_maps/pea_lab.yaml"/>
+  <arg name="map_file" default="$(find d_hospital_navigation)/maps/real_maps/mapa_segundo_andar.yaml"/>
 
   <!-- Map server -->
-  <node name="map_server" pkg="map_server" type="map_server" args="mapa_segundo_andar"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
 
   <!-- AMCL -->
   <include file="$(find d_hospital_navigation)/launch/amcl_d_hospital.launch"/>
