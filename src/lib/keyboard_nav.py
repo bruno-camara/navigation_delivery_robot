@@ -154,7 +154,7 @@ class KeyboardControler:
         while not self.stop:
             self.control.set_velocity(self.current_vel)
             self.control.set_rotation(self.current_rot)
-            time.sleep(1.0/1000)
+            time.sleep(50.0/1000)
 
         print("Here")
 
