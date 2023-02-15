@@ -112,7 +112,7 @@ def main():
 
 
         vx = velocity_msg#.linear.x
-        vth = -rot_msg#.angular.z
+        vth = rot_msg#.angular.z
 
         current_time = rospy.Time.now()
 
