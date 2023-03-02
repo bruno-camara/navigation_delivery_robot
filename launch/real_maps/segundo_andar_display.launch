@@ -11,15 +11,15 @@
   <!--param name="robot_description" command="$(find xacro)/xacro.py '$(find d_hospital_gazebo)/urdf/d_hospital.xacro'" /-->
 
     <!-- send fake joint values -->
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+  <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
       <param name="use_gui" value="False"/>
-    </node>
+    </node>-->                  <!--There is no robot model-->
 
     <!-- Combine joint values -->
-  <node
+  <!--<node
     name="robot_state_publisher"
     pkg="robot_state_publisher"
-    type="state_publisher" />
+    type="state_publisher" />-->       <!--There is no robot model-->
 
   <!-- Show in Rviz   -->
   <node
