@@ -1,5 +1,5 @@
-obstacle_range: 5 # Object detection distance
-raytrace_range: 5
+obstacle_range: 20 # Object detection distance
+raytrace_range: 20
 footprint: [[0.38, 0.21], [0.38, -0.21], [-0.38, -0.21], [-0.38, 0.21]]
 footprint_padding: 0.1
 #robot_radius: ir_of_robot
@@ -16,7 +16,9 @@ laser_scan_sensor: {sensor_frame: link_lidar,
                     data_type: LaserScan,
                     topic: /d_hospital/laser/scan,
                     marking: true,
-                    clearing: true
+                    clearing: true,
+                    obstacle_range: 15,
+                    raytrace_range: 20
                     }
 
 
