@@ -12,8 +12,8 @@ DWAPlannerROS:
   max_vel_y: 0
   min_vel_y: 0
 
-  max_rot_vel: 1.0
-  min_rot_vel: 0.3
+  max_vel_theta: 1.0
+  min_vel_theta: 0.3
 
 # Goal Tolerance Parametes
   xy_goal_tolerance: 0.5
