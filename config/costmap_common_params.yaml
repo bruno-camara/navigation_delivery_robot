@@ -1,5 +1,5 @@
-obstacle_range: 20 # Object detection distance
-raytrace_range: 20
+obstacle_range: 12 # Object detection distance
+raytrace_range: 10
 footprint: [[0.38, 0.21], [0.38, -0.21], [-0.38, -0.21], [-0.38, 0.21]]
 footprint_padding: 0.1
 #robot_radius: ir_of_robot

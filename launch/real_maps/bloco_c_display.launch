@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg
+    name="model" />
+  <arg
+    name="gui"
+    default="True" />
+
+  <!-- Show in Rviz   -->
+  <node
+    name="rviz"
+    pkg="rviz"
+    type="rviz"
+    args="-d $(find d_hospital_navigation)/rviz/real_maps/pea_lab.rviz" />
+</launch>
