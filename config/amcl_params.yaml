@@ -8,8 +8,8 @@
 # Overall filter parameters
 min_particles:        500       # 100,500
 max_particles:        5000     # 5000
-kld_err:              0.01      # 0.01, 0.05
-kld_z:                0.995      # 0.99
+kld_err:              0.02      # 0.01, 0.05
+kld_z:                0.99      # 0.99
 update_min_d:         0.1       # 0.2
 update_min_a:         0.1    # 0.5235
 resample_interval:    1         # 2, 1
