@@ -13,7 +13,7 @@ kld_z:                0.99      # 0.99
 update_min_d:         0.1       # 0.2
 update_min_a:         0.1    # 0.5235
 resample_interval:    1         # 2, 1
-transform_tolerance:  0.5       # 0.1, 0.2
+transform_tolerance:  0.7       # 0.1, 0.2
 recovery_alpha_slow:  0.001     # 0.0, 0.0, 0.001
 recovery_alpha_fast:  0.1       # 0.0, 0.0, 0.1
 initial_cov_xx:       0.25      # 0.25
