@@ -5,7 +5,8 @@
 
   <!-- move_base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+    <rosparam file="$(find d_hospital_navigation)/config/move_base_params.yaml" command="load"/>
+    <!--<param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />-->
     <rosparam file="$(find d_hospital_navigation)/config/local_costmap_params.yaml" command="load"/>
     <rosparam file="$(find d_hospital_navigation)/config/global_costmap_params.yaml" command="load"/>
     <rosparam file="$(find d_hospital_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap"/>
