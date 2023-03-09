@@ -11,6 +11,7 @@
     <rosparam file="$(find d_hospital_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap"/>
     <rosparam file="$(find d_hospital_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap"/>
     <rosparam file="$(find d_hospital_navigation)/config/dwa_local_planner_params_d_hospital.yaml" command="load" /> <!--CRIAR ESSE ARQUIVO-->
+    <rosparam file="$(find d_hospital_navigation)/config/navfn_params.yaml" command="load" />
     <!--<rosparam file="$(find d_hospital_navigation)/config/base_local_planner_params.yaml" command="load"/>--> <!--Usar só o DWA?-->
 
 
