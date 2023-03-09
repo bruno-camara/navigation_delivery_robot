@@ -47,7 +47,7 @@ def main():
     current_time = rospy.Time.now()
     last_time = rospy.Time.now()
 
-    rate = rospy.Rate(10.0)
+    rate = rospy.Rate(20.0)
     init = False
     while not rospy.is_shutdown():
 
