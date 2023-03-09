@@ -3,7 +3,7 @@ local_costmap:
     - {name: obstacles, type: "costmap_2d::ObstacleLayer"}
     - {name: inflation, type: "costmap_2d::InflationLayer"}
   # Coordinate frame and tf parameters
-  global_frame: odom
+  global_frame: map
   robot_base_frame: base
   transform_tolerance: 0.5
 
