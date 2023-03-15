@@ -5,7 +5,7 @@ local_costmap:
   # Coordinate frame and tf parameters
   global_frame: map
   robot_base_frame: base
-  transform_tolerance: 0.5
+  transform_tolerance: 1
 
   # Rate Parameters
   update_frequency: 2.0
