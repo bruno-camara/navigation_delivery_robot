@@ -7,5 +7,6 @@ sudo chmod 666 /dev/ttyUSB1
 
 
 roslaunch d_hospital_navigation segundo_andar.launch &
-roslaunch d_hospital_avigation segundo_andar_dysplay.launch &
+roslaunch d_hospital_navigation segundo_andar_dysplay.launch &
+rosrun d_hospital_navigation goal_from_app.py &
 cd src/d_hospital_navigation/src/server_test/ && npm start &
