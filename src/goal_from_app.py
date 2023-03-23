@@ -20,7 +20,7 @@ def read_instruction():
     file = open("src/d_hospital_navigation/src/server-test/from-server.txt", 'r')
     state = file.read()
     file.close()
-    rospy.loginfo(state)
+    #rospy.loginfo(state)
     return state
 
 
@@ -53,7 +53,7 @@ def main():
     state = read_instruction()
     rate = rospy.Rate(2)
     while not rospy.is_shutdown():
-        rospy.loginfo("Rospy not shutdown")
+        #rospy.loginfo("Rospy not shutdown")
         next_state = read_instruction()
         if state != next_state:
             state = next_state
