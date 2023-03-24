@@ -68,7 +68,7 @@ def main():
                 orientation_w = 1.0
                 orientation = [orientation_x, orientation_y, orientation_z, orientation_w]
                 publish_goal(pos, orientation)
-                #rospy.loginfo("going-to-point-a")
+                rospy.loginfo("going-to-point-a")
 
             elif state == roboState[3]:
                 pos_x = 29.5025749207
@@ -81,7 +81,7 @@ def main():
                 orientation_w = 0.0
                 orientation = [orientation_x, orientation_y, orientation_z, orientation_w]
                 publish_goal(pos, orientation)
-                #rospy.loginfo("going-to-point-a")
+                rospy.loginfo("going-to-point-a")
         rate.sleep()
 
 
