@@ -20,7 +20,7 @@ def main():
     kb.set_max_vel()
     kb.set_max_rot()
     kb.go_continuous()
-    print "See ya!"
+    print ("See ya!")
     return
     pass
 

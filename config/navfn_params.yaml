@@ -1,0 +1,17 @@
+# Navfn parameters for hallway navigation
+Navfn:
+  allow_unknown: false            # Allow navigation through unknown areas
+  cost_factor: 1.0               # Default cost factor for path planning
+  default_tolerance: 0.1        # Default tolerance for goal position
+  planner_type: "navfn/NavfnROS" # Planner type for navfn
+  potential_scale: 1.0           # Scale factor for the potential field
+  publish_potential: false       # Publish the potential map for visualization
+  visualize_potential: false     # Visualize the potential map
+  visualize_with_costmap: true   # Visualize the planned path on the costmap
+  visualizations:
+    markers: true                # Visualize markers
+    markers_scale: 0.2           # Scale factor for markers
+    path: true                   # Visualize planned path
+    potential: true              # Visualize potential map
+  use_dijkstra: true             # Use Dijkstra's algorithm for planning
+  use_quadratic: true            # Use quadratic approximation of the potential field

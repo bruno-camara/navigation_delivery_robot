@@ -1,11 +1,34 @@
-# static_map - True if using existing map
-
 global_costmap:
+  # Plugins
+  plugins:
+    - {name: static, type: "costmap_2d::StaticLayer"}
+    - {name: obstacles, type: "costmap_2d::ObstacleLayer"}
+    - {name: inflation, type: "costmap_2d::InflationLayer"}
+
+  static:
+    unknown_cost_value: -1
+    lethal_cost_threshold: 100
+    map_topic: "map"
+    first_map_only: false
+    subscribe_to_updates: true
+    track_unknown_space: true
+    use_maximum: false
+    trinary_costmap: true
+
+  # Coordinate frame and tf parameters
   global_frame: map
   robot_base_frame: base
-  update_frequency: 1.0
-  publish_frequency: 1.0
+  transform_tolerance: 1
+
+  # Rate Parameters
+  update_frequency: 3.0
+  publish_frequency: 2.0
+
+  # Map management parameters
+  rolling_window: false
+  always_send_full_costmap: true
+
+  # Can be overwritten by some layers
+  width: 30.0
+  height: 30.0
   resolution: 0.05
-  static_map: true
-  width: 10.0
-  height: 10.0

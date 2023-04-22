@@ -1,23 +1,33 @@
-obstacle_range: 5 # Object detection distance
-raytrace_range: 5
+# Everything in common is present in both local and global
+
 footprint: [[0.38, 0.21], [0.38, -0.21], [-0.38, -0.21], [-0.38, 0.21]]
-footprint_padding: 0.1
-#robot_radius: ir_of_robot
-#robot_radius: 0.4 # distance a circular robot should be clear of the obstacle
-inflation_radius: 0.3
-cost_scaling_factor: 0.7
+footprint_padding: 0.1 # size of extra spaces around the robot
 
-map_type: costmap
-observation_sources: laser_scan_sensor #point_cloud_sensor
+# Obstacle layer parameters
+obstacles:
+  max_obstacle_height: 2
+  obstacle_range: 4.0
+  raytrace_range: 5.0
+  track_unknown_space: true
+  footprint_clearing_enabled: true
+  combination_method: 1
 
-# marking - add obstacle information to cost map
-# clearing - clear obstacle information to cost map
-laser_scan_sensor: {sensor_frame: link_lidar, 
-                    data_type: LaserScan,
-                    topic: /d_hospital/laser/scan, 
-                    marking: true, 
-                    clearing: true
-                    }
+  observation_sources: laser_scan_sensor #point_cloud_sensor
+
+  laser_scan_sensor: {sensor_frame: link_lidar,
+                      data_type: LaserScan,
+                      topic: /d_hospital/laser/scan,
+                      marking: true,
+                      clearing: true,
+                      obstacle_range: 7,
+                      raytrace_range: 10,
+                      }
+  #point_cloud_sensor: {sensor_frame: frame_name, data_type: PointCloud, topic: topic_name, marking: true, clearing: true}
 
 
-#point_cloud_sensor: {sensor_frame: frame_name, data_type: PointCloud, topic: topic_name, marking: true, clearing: true}
+
+
+# Inflation layer parameters
+inflation:
+  inflation_radius: 1.0
+  cost_scaling_factor: 10.0
