@@ -12,24 +12,27 @@ from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TwistStam
 
 
 
+
 velocity_msg= 0.0 #Twist()
 rot_msg = 0.0 # Twist()
+last_time = 0.0
+current_time = 0.0
+dt = 0.1
 
-
+cbk_flag = True
 
 
 def main():
+    global velocity_msg, rot_msg, last_time, current_time, dt, cbk_flag
     rospy.init_node('fixed_tf_broadcaster')
     br = tf.TransformBroadcaster()
     br1 = tf.TransformBroadcaster()
     br2 = tf.TransformBroadcaster()
 
-    br_sens_b = tf.TransformBroadcaster()
     br_sens_br = tf.TransformBroadcaster()
     br_sens_bl = tf.TransformBroadcaster()
-    br_sens_f = tf.TransformBroadcaster()
-    br_sens_fr = tf.TransformBroadcaster()
-    br_sens_fl = tf.TransformBroadcaster()
+    br_sens_r = tf.TransformBroadcaster()
+    br_sens_l = tf.TransformBroadcaster()
 
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=1)
 
@@ -41,116 +44,88 @@ def main():
     y = 0.0
     th = 0.0
 
+
     vx = 0.0  ### Implementar metodo para coletar vx
     vth = 0.0 ### Implementar metodo para colatar vth
 
-    current_time = rospy.Time.now()
-    last_time = rospy.Time.now()
+    odom_quat = quaternion_from_euler(0, 0, th)
 
-    rate = rospy.Rate(10.0)
-    init = False
+    rate = rospy.Rate(200.0)
     while not rospy.is_shutdown():
 
-        #rospy.spin()
+        if cbk_flag:
+            vx = velocity_msg
+            vth = rot_msg
 
-        #Criar parametrizacao para posicao inicial no mapa
-        if not init:
-            br.sendTransform((0.0, 0.0, 1.0),
-                            (0.0, 0.0, 0.0, 1.0),
-                            rospy.Time.now(),
-                            "odom",
-                            "map")
-            init = True
-        # Localizar partes do robo em relacao a base
-        br1.sendTransform((0.0, 0.0, 0.7),
+            delta_x = (vx * math.cos(th)) * dt
+            delta_y = (vx * math.sin(th)) * dt
+            delta_th = vth * dt
+
+            x += delta_x
+            y += delta_y
+            th += delta_th
+
+
+             ## This will publish an Odom message.
+            ## Intresting to have control ESP32 publishing this with driver info
+
+            odom = Odometry()
+            odom.header.stamp = rospy.Time.now()
+            odom.header.frame_id = "odom"
+
+            # set the position
+            odom_quat = quaternion_from_euler(0, 0, th)
+            odom.pose.pose = Pose(Point(x, y, 0.), Quaternion(*odom_quat))
+
+            # set the velocity
+            odom.child_frame_id = "base"
+            odom.twist.twist = Twist(Vector3(vx, 0, 0), Vector3(0, 0, vth))
+
+            # publish the message
+            odom_pub.publish(odom)
+            cbk_flag = False
+
+
+        br.sendTransform((0.0, 0.0, 1.0),
                         (0.0, 0.0, 0.0, 1.0),
                         rospy.Time.now(),
                         "link_lidar",
                         "base")
         rotation = quaternion_from_euler(0, 0, math.pi)
         br_sens_b.sendTransform((-0.38, 0.0, -0.46),
+
                         rotation,
                         rospy.Time.now(),
-                        "distance_sensor_back",
+                        "laser",
                         "base")
 
         rotation = quaternion_from_euler(0, 0, -math.pi/2)
-        br_sens_br.sendTransform((-0.22, -0.25, -0.46),
+        br_sens_br.sendTransform((-0.275, -0.085, -0.44),
                         rotation,
                         rospy.Time.now(),
                         "distance_sensor_back_right",
                         "base")
 
-        rotation = quaternion_from_euler(0, 0, math.pi/2)
-        br_sens_bl.sendTransform((-0.22, 0.25, -0.46),
+        rotation = quaternion_from_euler(0, 0, math.pi)
+        br_sens_bl.sendTransform((-0.275, 0.085, -0.44),
                         rotation,
                         rospy.Time.now(),
                         "distance_sensor_back_left",
                         "base")
 
-        rotation = quaternion_from_euler(0, 0, 0)
-        br_sens_f.sendTransform((0.38, 0.0, -0.46),
-                        rotation,
-                        rospy.Time.now(),
-                        "distance_sensor_front",
-                        "base")
-
-        rotation = quaternion_from_euler(0, 0, -math.pi/2)
-        br_sens_fr.sendTransform((0.22, -0.25, -0.46),
+        rotation = quaternion_from_euler(0, 0, -math.pi)
+        br_sens_r.sendTransform((0.0, -0.256, -0.44),
                         rotation,
                         rospy.Time.now(),
                         "distance_sensor_front_right",
                         "base")
 
         rotation = quaternion_from_euler(0, 0, math.pi/2)
-        br_sens_fl.sendTransform((0.22, 0.25, -0.46),
+        br_sens_l.sendTransform((0.0, 0.256, -0.44),
                         rotation,
                         rospy.Time.now(),
                         "distance_sensor_front_left",
                         "base")
-
-
-
-        vx = velocity_msg#.linear.x
-        vth = rot_msg#.angular.z
-
-        current_time = rospy.Time.now()
-
-        dt = (current_time - last_time).to_sec()
-        delta_x = (vx * math.cos(th)) * dt
-        delta_y = (vx * math.sin(th)) * dt
-        delta_th = vth * dt
-
-        x += delta_x
-        y += delta_y
-        th += delta_th
-
-        odom_quat = tf.transformations.quaternion_from_euler(0, 0, th)
-
-        br2.sendTransform((x, y, 0.0),
-                        odom_quat,
-                        current_time,
-                        "base",
-                        "odom")
-
-        ## This will publish an Odom message.
-        ## Intresting to have control ESP32 publishing this with driver info
-
-        odom = Odometry()
-        odom.header.stamp = current_time
-        odom.header.frame_id = "odom"
-
-        # set the position
-        odom.pose.pose = Pose(Point(x, y, 0.), Quaternion(*odom_quat))
-
-        # set the velocity
-        odom.child_frame_id = "base"
-        odom.twist.twist = Twist(Vector3(vx, 0, 0), Vector3(0, 0, vth))
-
-        # publish the message
-        odom_pub.publish(odom)
-
-        last_time = current_time
 
 
         rate.sleep()
@@ -159,6 +134,7 @@ def _callback(data):
     global velocity_msg, rot_msg
     velocity_msg = data.twist.linear.x
     rot_msg = data.twist.angular.z
+
     return
 
 
