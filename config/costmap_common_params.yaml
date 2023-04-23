@@ -31,4 +31,3 @@ obstacles:
 inflation:
   inflation_radius: 1.0
   cost_scaling_factor: 10.0
-

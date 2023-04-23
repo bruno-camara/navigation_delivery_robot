@@ -17,7 +17,6 @@ global_costmap:
 
   # Coordinate frame and tf parameters
   global_frame: map
-
   robot_base_frame: base
   transform_tolerance: 1
 
